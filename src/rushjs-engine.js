@@ -1,25 +1,58 @@
 var RushEngine = (function(){
 
-    var renderer = function(canvas,layers){
-        // this._canvas = document.querySelector(canvas);
-        // this._context = this._canvas.getContext('2d');
-        // this._layers = [];
-        // this._layerIndexes = {};
+    var engine = function( options ){
 
-        // this._bind();
-        // this.resetLayers(layers);
+        var extended = this._applyDefaults( options );
     };
 
-    // renderer.prototype.resetLayers = function(layers) {
-    //     if(layers instanceof Array){
-    //         this._layers = [];
-    //         this._layerIndexes = {};
+    engine.prototype._defaults = {
+        'target': null,
+        'stepCallback': null,
+        'layers': null
+    };
 
-    //         for (var i = 0, ln = layers.length; i < ln; i++) {
-    //             this.addLayer( layers[i] );
-    //         }
-    //     }
-    // };
+    engine.prototype._applyDefaults = function( options ) {
+
+        if ( typeof options !== 'object' || typeof options.target === 'undefined' ) {
+            console.error( 'The "target" option is required.' );
+            return false;
+        }
+
+        var data = Object.create( this._defaults );
+
+        for ( var key in data ) {
+            if( typeof options[ key ] !== 'undefined' )
+                data[ key ] = options[ key ];
+        }
+
+        return data;
+    };
+
+    engine.prototype.target = function( target ) {
+        if( typeof target !== 'undefined' ) {
+            var targetElement = typeof target === 'string' ? document.querySelector( target ) : target;
+
+            if( targetElement instanceof HTMLCanvasElement ) {
+                this._data.target = targetElement;
+            } else {
+                console.error( 'The "target" option must be a canvas element or a string selector to one of them.' );
+                return false;
+            }
+        }
+
+        return this._data.target;
+    };
+
+
+    renderer.prototype.resetLayers = function( layers ) {
+        if(layers instanceof Array){
+            this._data.layers = [];
+
+            for (var i = 0, ln = layers.length; i < ln; i++) {
+                this.addLayer( layers[i] );
+            }
+        }
+    };
 
     // renderer.prototype.addLayer = function(layer) {
     //     if(layer instanceof Object && layer.name && typeof this._layerIndexes[layer.name] !== 'number'){
