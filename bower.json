@@ -1,0 +1,24 @@
+{
+  "name": "rushjs",
+  "description": "A rendering engine for HTML5 canvas with layer support.",
+  "main": [
+    "dist/canvas-render-engine.js"
+  ],
+  "keywords": [
+    "html5",
+    "canvas",
+    "animation",
+    "layers",
+    "engine",
+    "renderer"
+  ],
+  "authors": [
+    "Henrique Müller <hbmuller@gmail.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "node_modules",
+    "bower_components"
+  ],
+  "private": false
+}
