@@ -1,0 +1,27 @@
+{
+  "name": "rushjs",
+  "version": "0.1.0",
+  "description": "A rendering engine for HTML5 canvas with layer support.",
+  "main": "dist/rushjs.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hbmuller/rush-js.git"
+  },
+  "keywords": [
+    "html5",
+    "canvas",
+    "animation",
+    "layers",
+    "engine",
+    "renderer"
+  ],
+  "author": "Henrique Müller <hbmuller@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "gulp": "~3.9.1",
+    "gulp-concat": "~2.6.0",
+    "gulp-uglify": "~1.5.4",
+    "gulp-rename": "~1.2.2"
+  }
+}

@@ -12,12 +12,11 @@ gulp.task('js-concat', function(){
         .pipe( gulp.dest('dist') );
 });
 
-gulp.task('js-uglify', function(){
+gulp.task('js-uglify',['js-concat'], function(){
     return gulp.src('dist/rushjs.js')
         .pipe( uglify() )
-        .pipe( rename('dist/rushjs.min.js') )
+        .pipe( rename('rushjs.min.js') )
         .pipe( gulp.dest('dist') );
 });
 
-gulp.task('default', ['js-concat'], function(){});
-gulp.task('build', ['js-concat','js-uglify'], function(){});
+gulp.task('default', ['js-uglify']);
