@@ -1,14 +1,31 @@
 var RushEngine = (function(){
 
     var engine = function( options ){
-
         var extended = this._applyDefaults( options );
+
+        this._data = { createdAt: performance.now() };
+
+        this.resetLayers( extended.layers );
+        if(typeof extended.stepStart === 'function')
+            this._data.stepStart = extended.stepStart;
+        if(typeof extended.stepEnd === 'function')
+            this._data.stepEnd = extended.stepEnd;
+
+        if( this.target( extended.target ) ){
+            if( extended.autoStart ){
+                this.start();
+            }
+        } else {
+            console.error("The engine needs a canvas target, even if it's not onscreen.");
+        }
     };
 
     engine.prototype._defaults = {
         'target': null,
-        'stepCallback': null,
-        'layers': null
+        'stepStart': null,
+        'stepEnd': null,
+        'layers': null,
+        'autoStart': true
     };
 
     engine.prototype._applyDefaults = function( options ) {
@@ -29,86 +46,121 @@ var RushEngine = (function(){
     };
 
     engine.prototype.target = function( target ) {
-        if( typeof target !== 'undefined' ) {
+        if( target ) {
             var targetElement = typeof target === 'string' ? document.querySelector( target ) : target;
 
             if( targetElement instanceof HTMLCanvasElement ) {
                 this._data.target = targetElement;
+                this._data.context = targetElement.getContext('2d');
+                this.setCanvasSize();
             } else {
                 console.error( 'The "target" option must be a canvas element or a string selector to one of them.' );
                 return false;
             }
         }
 
-        return this._data.target;
+        return this._data.target || null;
     };
 
+    engine.prototype.setCanvasSize = function(width,height) {
+        var canvasWidth = typeof width === 'number' ? width : this._data.target.clientWidth;
+        var canvasHeight = typeof height === 'number' ? height : this._data.target.clientHeight;
 
-    renderer.prototype.resetLayers = function( layers ) {
+        this._data.target.width = canvasWidth;
+        this._data.target.height = canvasHeight;
+
+        this._data.width = canvasWidth;
+        this._data.height = canvasHeight;
+    };
+
+    engine.prototype.resetLayers = function( layers ) {
+        this._data.layers = [];
+
         if(layers instanceof Array){
-            this._data.layers = [];
-
             for (var i = 0, ln = layers.length; i < ln; i++) {
                 this.addLayer( layers[i] );
             }
         }
     };
 
-    // renderer.prototype.addLayer = function(layer) {
-    //     if(layer instanceof Object && layer.name && typeof this._layerIndexes[layer.name] !== 'number'){
+    engine.prototype.addLayer = function( layer ) {
+        if( layer instanceof RushLayer ){
+            this._data.layers.push(layer);
+            return layer;
+        } else {
+            console.error( 'The "layer" parameter must be a RushLayer instance.' );
+            return false;
+        }
+    };
 
-    //         if (typeof layer.x !== 'number') layer.x = 0;
-    //         if (typeof layer.y !== 'number') layer.y = 0;
-    //         if (typeof layer.opacity !== 'number') layer.opacity = 1;
+    engine.prototype.removeLayer = function( layer ) {
+        if( layer instanceof RushLayer || (typeof layer === 'string' && layer !== '')){
+            for (var i = this._data.layers.length - 1; i >= 0; i--) {
+                var currLayer = this._data.layers[i];
+                if( currLayer === layer || currLayer.label() === layer ){
+                    this._data.layers.splice(i,1);
+                }
+            }
+        } else {
+            console.error( 'The "layer" parameter must be a RushLayer instance or a string representing the layer label.' );
+        }
 
-    //         this._layers.push(layer);
-    //         this._layerIndexes[layer.name] = this._layers.length - 1;
-    //     }
-    // };
+        return this._data.layers.length;
+    };
 
-    // renderer.prototype.draw = function() {
-    //     var canvasData = this.getCanvasData();
-    //     this._context.clearRect(0,0,canvasData.width,canvasData.height);
+    engine.prototype.draw = function() {
+        var d = this._data;
+        d.context.clearRect(0,0, d.width, d.height);
 
-    //     for (var i = 0, ln = this._layers.length; i < ln; i++) {
-    //         var layer = this._layers[i];
-    //         this._context.globalAlpha = layer.opacity;
-    //         this._context.drawImage(layer.source,layer.x,layer.y);
-    //     }
-    // };
+        for (var i = 0, ln = d.layers.length; i < ln; i++) {
+            var layer = d.layers[ i ];
 
-    // renderer.prototype.getCanvasData = function() {
-    //     return this._canvasData || this.setCanvasData();
-    // };
+            if( layer.active() && layer.source() && layer.opacity() ) {
+                var position = layer.position();
 
-    // renderer.prototype.setCanvasData = function() {
-    //     var canvasWidth = this._canvas.clientWidth;
-    //     var canvasHeight = this._canvas.clientHeight;
+                d.context.globalAlpha = layer.opacity();
+                d.context.drawImage(layer.source(), position.x, position.y);
+            }
+        }
 
-    //     this._canvas.width = canvasWidth;
-    //     this._canvas.height = canvasHeight;
+        d.context.globalAlpha = 1;
+    };
 
-    //     this._canvasData = {
-    //         width: canvasWidth,
-    //         height: canvasHeight
-    //     };
+    engine.prototype.start = function() {
+        var
+            now = performance.now()
+            d = this._data;
 
-    //     return this._canvasData;
-    // };
+        d.startedAt = now;
+        d.lastCall = now;
+        d.running = true;
 
-    // renderer.prototype.setLayersSources = function(sources) {
-    //     for(var layerName in sources){
-    //         var index = this._layerIndexes[ layerName ];
-    //         if(typeof index === 'number'){
-    //             this._layers[ index ].source = sources[layerName];
-    //         }else{
-    //             this.addLayer({
-    //                 name: layerName,
-    //                 source: sources[layerName]
-    //             });
-    //         }
-    //     }
-    // };
+        this.step(now);
+    };
 
-    return renderer;
+    engine.prototype.step = function(now) {
+        var
+            d = this._data,
+            offset = now - d.lastCall,
+            _this = this;
+
+        if(typeof d.stepStart === 'function')
+            d.stepStart(offset,now);
+
+        this.draw();
+
+        if(typeof d.stepEnd === 'function')
+            d.stepEnd(offset,now);
+
+        if( d.running )
+            requestAnimationFrame(function( now ){
+                _this.step( now );
+            });
+    };
+
+    engine.prototype.stop = function() {
+        this._data.running = false;
+    };
+
+    return engine;
 }());

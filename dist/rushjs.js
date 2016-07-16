@@ -1,116 +1,265 @@
 var RushLayer = (function(){
 
-    var layer = function(source, opacity){
-        this.source( source );
-        this.opacity( opacity );
+    var layer = function( options ){
+
+        var extended = this._applyDefaults( options );
+
+        this._data = {};
+        this.source( extended.source );
+        this.opacity( extended.opacity );
+        this.label( extended.label );
+        this.active( extended.active );
+        this.position( extended.x, extended.y );
     };
 
-    layer.prototype._data = {};
+    layer.prototype._defaults = {
+        'source': null,
+        'label': '',
+        'opacity': 1,
+        'active': true,
+        'x': 0,
+        'y': 0
+    };
+
+    layer.prototype._applyDefaults = function( options ) {
+
+        var data = Object.create( this._defaults );
+
+        for ( var key in data ) {
+            if( typeof options[ key ] !== 'undefined' )
+                data[ key ] = options[ key ];
+        }
+
+        return data;
+    };
 
     layer.prototype.source = function( source ) {
-        if( typeof newValue !== 'undefined' ) {
+        if( source ) {
             var sourceElement = typeof source === 'string' ? document.querySelector( source ) : source;
 
-            if ( sourceElement instanceof HTMLImageElement || sourceElement instanceof HTMLCanvasElement ) {
+            if( sourceElement instanceof HTMLImageElement || sourceElement instanceof HTMLCanvasElement ) {
                 this._data.source = sourceElement;
             } else {
+                console.error( 'The "source" option must be a canvas or image element or a string selector to one of them.' );
                 return false;
             }
         }
 
-        return this._data.source;
+        return this._data.source || null;
     };
 
-    layer.prototype.opacity = function( newValue ) {
-        if( typeof newValue === 'number' ) {
-            this._data.opacity = Math.max( 0, Math.min( 1, newValue ) );
-        } else if( typeof newValue !== 'undefined' ) {
+    layer.prototype.label = function( label ) {
+        if( typeof label === 'string' ) {
+            this._data.label = label;
+        } else if( typeof label !== 'undefined' ) {
+            console.error( 'The "label" option must be a string' );
+            return false;
+        }
+
+        return this._data.label;
+    };
+
+    layer.prototype.opacity = function( opacity ) {
+        if( typeof opacity === 'number' ) {
+            this._data.opacity = Math.max( 0, Math.min( 1, opacity ) );
+        } else if( typeof opacity !== 'undefined' ) {
+            console.error( 'The "opacity" option must be a number' );
             return false;
         }
 
         return this._data.opacity;
     };
 
+    layer.prototype.active = function( active ) {
+        if( typeof active === 'boolean' ) {
+            this._data.active = active;
+        } else if( typeof active !== 'undefined' ) {
+            console.error( 'The "active" option must be a boolean' );
+            return;
+        }
+
+        return this._data.active;
+    };
+
+    layer.prototype.position = function( x, y ) {
+        if( typeof x === 'number' && typeof x === 'number' ) {
+            this._data.position = {
+                x: x,
+                y: y
+            };
+        } else if( typeof x !== 'undefined' || typeof y !== 'undefined' ) {
+            console.error( 'Both "x" and "y" options must be numbers' );
+            return false;
+        }
+
+        return this._data.position;
+    };
+
     return layer;
 }());
 var RushEngine = (function(){
 
-    var renderer = function(canvas,layers){
-        // this._canvas = document.querySelector(canvas);
-        // this._context = this._canvas.getContext('2d');
-        // this._layers = [];
-        // this._layerIndexes = {};
+    var engine = function( options ){
+        var extended = this._applyDefaults( options );
 
-        // this._bind();
-        // this.resetLayers(layers);
+        this._data = { createdAt: performance.now() };
+
+        this.resetLayers( extended.layers );
+        if(typeof extended.stepStart === 'function')
+            this._data.stepStart = extended.stepStart;
+        if(typeof extended.stepEnd === 'function')
+            this._data.stepEnd = extended.stepEnd;
+
+        if( this.target( extended.target ) ){
+            if( extended.autoStart ){
+                this.start();
+            }
+        } else {
+            console.error("The engine needs a canvas target, even if it's not onscreen.");
+        }
     };
 
-    // renderer.prototype.resetLayers = function(layers) {
-    //     if(layers instanceof Array){
-    //         this._layers = [];
-    //         this._layerIndexes = {};
+    engine.prototype._defaults = {
+        'target': null,
+        'stepStart': null,
+        'stepEnd': null,
+        'layers': null,
+        'autoStart': true
+    };
 
-    //         for (var i = 0, ln = layers.length; i < ln; i++) {
-    //             this.addLayer( layers[i] );
-    //         }
-    //     }
-    // };
+    engine.prototype._applyDefaults = function( options ) {
 
-    // renderer.prototype.addLayer = function(layer) {
-    //     if(layer instanceof Object && layer.name && typeof this._layerIndexes[layer.name] !== 'number'){
+        if ( typeof options !== 'object' || typeof options.target === 'undefined' ) {
+            console.error( 'The "target" option is required.' );
+            return false;
+        }
 
-    //         if (typeof layer.x !== 'number') layer.x = 0;
-    //         if (typeof layer.y !== 'number') layer.y = 0;
-    //         if (typeof layer.opacity !== 'number') layer.opacity = 1;
+        var data = Object.create( this._defaults );
 
-    //         this._layers.push(layer);
-    //         this._layerIndexes[layer.name] = this._layers.length - 1;
-    //     }
-    // };
+        for ( var key in data ) {
+            if( typeof options[ key ] !== 'undefined' )
+                data[ key ] = options[ key ];
+        }
 
-    // renderer.prototype.draw = function() {
-    //     var canvasData = this.getCanvasData();
-    //     this._context.clearRect(0,0,canvasData.width,canvasData.height);
+        return data;
+    };
 
-    //     for (var i = 0, ln = this._layers.length; i < ln; i++) {
-    //         var layer = this._layers[i];
-    //         this._context.globalAlpha = layer.opacity;
-    //         this._context.drawImage(layer.source,layer.x,layer.y);
-    //     }
-    // };
+    engine.prototype.target = function( target ) {
+        if( target ) {
+            var targetElement = typeof target === 'string' ? document.querySelector( target ) : target;
 
-    // renderer.prototype.getCanvasData = function() {
-    //     return this._canvasData || this.setCanvasData();
-    // };
+            if( targetElement instanceof HTMLCanvasElement ) {
+                this._data.target = targetElement;
+                this._data.context = targetElement.getContext('2d');
+                this.setCanvasSize();
+            } else {
+                console.error( 'The "target" option must be a canvas element or a string selector to one of them.' );
+                return false;
+            }
+        }
 
-    // renderer.prototype.setCanvasData = function() {
-    //     var canvasWidth = this._canvas.clientWidth;
-    //     var canvasHeight = this._canvas.clientHeight;
+        return this._data.target || null;
+    };
 
-    //     this._canvas.width = canvasWidth;
-    //     this._canvas.height = canvasHeight;
+    engine.prototype.setCanvasSize = function(width,height) {
+        var canvasWidth = typeof width === 'number' ? width : this._data.target.clientWidth;
+        var canvasHeight = typeof height === 'number' ? height : this._data.target.clientHeight;
 
-    //     this._canvasData = {
-    //         width: canvasWidth,
-    //         height: canvasHeight
-    //     };
+        this._data.target.width = canvasWidth;
+        this._data.target.height = canvasHeight;
 
-    //     return this._canvasData;
-    // };
+        this._data.width = canvasWidth;
+        this._data.height = canvasHeight;
+    };
 
-    // renderer.prototype.setLayersSources = function(sources) {
-    //     for(var layerName in sources){
-    //         var index = this._layerIndexes[ layerName ];
-    //         if(typeof index === 'number'){
-    //             this._layers[ index ].source = sources[layerName];
-    //         }else{
-    //             this.addLayer({
-    //                 name: layerName,
-    //                 source: sources[layerName]
-    //             });
-    //         }
-    //     }
-    // };
+    engine.prototype.resetLayers = function( layers ) {
+        this._data.layers = [];
 
-    return renderer;
+        if(layers instanceof Array){
+            for (var i = 0, ln = layers.length; i < ln; i++) {
+                this.addLayer( layers[i] );
+            }
+        }
+    };
+
+    engine.prototype.addLayer = function( layer ) {
+        if( layer instanceof RushLayer ){
+            this._data.layers.push(layer);
+            return layer;
+        } else {
+            console.error( 'The "layer" parameter must be a RushLayer instance.' );
+            return false;
+        }
+    };
+
+    engine.prototype.removeLayer = function( layer ) {
+        if( layer instanceof RushLayer || (typeof layer === 'string' && layer !== '')){
+            for (var i = this._data.layers.length - 1; i >= 0; i--) {
+                var currLayer = this._data.layers[i];
+                if( currLayer === layer || currLayer.label() === layer ){
+                    this._data.layers.splice(i,1);
+                }
+            }
+        } else {
+            console.error( 'The "layer" parameter must be a RushLayer instance or a string representing the layer label.' );
+        }
+
+        return this._data.layers.length;
+    };
+
+    engine.prototype.draw = function() {
+        var d = this._data;
+        d.context.clearRect(0,0, d.width, d.height);
+
+        for (var i = 0, ln = d.layers.length; i < ln; i++) {
+            var layer = d.layers[ i ];
+
+            if( layer.active() && layer.source() && layer.opacity() ) {
+                var position = layer.position();
+
+                d.context.globalAlpha = layer.opacity();
+                d.context.drawImage(layer.source(), position.x, position.y);
+            }
+        }
+
+        d.context.globalAlpha = 1;
+    };
+
+    engine.prototype.start = function() {
+        var
+            now = performance.now()
+            d = this._data;
+
+        d.startedAt = now;
+        d.lastCall = now;
+        d.running = true;
+
+        this.step(now);
+    };
+
+    engine.prototype.step = function(now) {
+        var
+            d = this._data,
+            offset = now - d.lastCall,
+            _this = this;
+
+        if(typeof d.stepStart === 'function')
+            d.stepStart(offset,now);
+
+        this.draw();
+
+        if(typeof d.stepEnd === 'function')
+            d.stepEnd(offset,now);
+
+        if( d.running )
+            requestAnimationFrame(function( now ){
+                _this.step( now );
+            });
+    };
+
+    engine.prototype.stop = function() {
+        this._data.running = false;
+    };
+
+    return engine;
 }());
