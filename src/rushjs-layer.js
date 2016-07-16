@@ -3,28 +3,25 @@ var RushLayer = (function(){
     var layer = function( options ){
 
         var extended = this._applyDefaults( options );
-        if( extended ) {
-            this._data = {};
-            this.source( extended.source );
-            this.opacity( extended.opacity );
-            this.position( extended.x, extended.y );
-        }
+
+        this._data = {};
+        this.source( extended.source );
+        this.opacity( extended.opacity );
+        this.label( extended.label );
+        this.active( extended.active );
+        this.position( extended.x, extended.y );
     };
 
     layer.prototype._defaults = {
         'source': null,
         'label': '',
         'opacity': 1,
+        'active': true,
         'x': 0,
-        'y': 0,
+        'y': 0
     };
 
     layer.prototype._applyDefaults = function( options ) {
-
-        if ( typeof options !== 'object' || typeof options.source === 'undefined' ) {
-            console.error( 'The "source" option is required.' );
-            return false;
-        }
 
         var data = Object.create( this._defaults );
 
@@ -37,7 +34,7 @@ var RushLayer = (function(){
     };
 
     layer.prototype.source = function( source ) {
-        if( typeof source !== 'undefined' ) {
+        if( source ) {
             var sourceElement = typeof source === 'string' ? document.querySelector( source ) : source;
 
             if( sourceElement instanceof HTMLImageElement || sourceElement instanceof HTMLCanvasElement ) {
@@ -48,7 +45,7 @@ var RushLayer = (function(){
             }
         }
 
-        return this._data.source;
+        return this._data.source || null;
     };
 
     layer.prototype.label = function( label ) {
@@ -59,7 +56,7 @@ var RushLayer = (function(){
             return false;
         }
 
-        return this._data.opacity;
+        return this._data.label;
     };
 
     layer.prototype.opacity = function( opacity ) {
@@ -73,16 +70,29 @@ var RushLayer = (function(){
         return this._data.opacity;
     };
 
+    layer.prototype.active = function( active ) {
+        if( typeof active === 'boolean' ) {
+            this._data.active = active;
+        } else if( typeof active !== 'undefined' ) {
+            console.error( 'The "active" option must be a boolean' );
+            return;
+        }
+
+        return this._data.active;
+    };
+
     layer.prototype.position = function( x, y ) {
         if( typeof x === 'number' && typeof x === 'number' ) {
-            this._data.x = x;
-            this._data.y = y;
+            this._data.position = {
+                x: x,
+                y: y
+            };
         } else if( typeof x !== 'undefined' || typeof y !== 'undefined' ) {
             console.error( 'Both "x" and "y" options must be numbers' );
             return false;
         }
 
-        return { x: this._data.x, y: this._data.y };
+        return this._data.position;
     };
 
     return layer;
