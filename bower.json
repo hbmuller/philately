@@ -2,7 +2,8 @@
   "name": "rushjs",
   "description": "A rendering engine for HTML5 canvas with layer support.",
   "main": [
-    "dist/canvas-render-engine.js"
+    "dist/rushjs.js",
+    "dist/rushjs.min.js",
   ],
   "keywords": [
     "html5",

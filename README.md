@@ -1,2 +1,2 @@
-# canvas-layer-renderer
-A simple layer renderer for HTML5 canvas.
+# rushJS
+A rendering engine for HTML5 canvas with layer support.
