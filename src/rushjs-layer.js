@@ -73,9 +73,6 @@ var RushLayer = (function(){
     layer.prototype.active = function( active ) {
         if( typeof active === 'boolean' ) {
             this._data.active = active;
-        } else if( typeof active !== 'undefined' ) {
-            console.error( 'The "active" option must be a boolean' );
-            return;
         }
 
         return this._data.active;
@@ -87,9 +84,6 @@ var RushLayer = (function(){
                 x: x,
                 y: y
             };
-        } else if( typeof x !== 'undefined' || typeof y !== 'undefined' ) {
-            console.error( 'Both "x" and "y" options must be numbers' );
-            return false;
         }
 
         return this._data.position;
