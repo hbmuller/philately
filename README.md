@@ -59,21 +59,18 @@ And then add it to our engine:
 
 - **source**: [*string* or *object*] A selector indicating an image or canvas element in the current document; or an element object, being either an instance of `HTMLImageElement` or `HTMLCanvasElement`.
 *Default: null*
-
 - **label**: [*string*] A textual label for the layer. Used mainly to search for a layer and remove it.
 *Default: "" (empty string)*
-
 - **opacity**: [*number*] A decimal number from 0 to 1 representing the layer opacity.
 *Default: 1*
-
 - **active**: [*boolean*] A boolean used to turn layer rendering on (`true`) or off (`false`).
 *Default: true*
-
 - **x**: [*number*] The horizontal position of the layer, relative to the canvas size.
 *Default: 0*
-
 - **y**: [*number*] The vertical position of the layer, relative to the canvas size.
 *Default: 0*
+
+---
 
 ### .source( [element] )
 Gets or sets the source element of the layer. If the "element" parameter is provided, updates the source.
@@ -82,6 +79,7 @@ Gets or sets the source element of the layer. If the "element" parameter is prov
 
 **Return value:** the source DOM element object of the layer. If an invalid "element" parameter is provided, returns `false`.
 
+---
 
 ### .label( [label] )
 Gets or sets a label for the layer. If an string is provided as the "label" parameter, updates the label.
@@ -90,6 +88,7 @@ Gets or sets a label for the layer. If an string is provided as the "label" para
 
 **Return value:** the layer's label string. If an invalid parameter is provided, returns `false`.
 
+---
 
 ### .opacity( [opacity] )
 Gets or sets the opacity of the layer. If the "opacity" parameter is provided, updates the opacity.
@@ -98,6 +97,7 @@ Gets or sets the opacity of the layer. If the "opacity" parameter is provided, u
 
 **Return value:** a decimal number from 0 to 1. If an invalid parameter is provided, returns `false`.
 
+---
 
 ### .active( [active] )
 Gets or sets the rendering control of the layer. If the "active" parameter is provided, updates the control.
@@ -106,6 +106,7 @@ Gets or sets the rendering control of the layer. If the "active" parameter is pr
 
 **Return value:** a boolean representing rendering control of the layer.
 
+---
 
 ### .position( [x, y] )
 Gets or sets the position of the layer. If **both "x" and "y"** parameters are provided, updates the position.
@@ -119,24 +120,29 @@ Gets or sets the position of the layer. If **both "x" and "y"** parameters are p
 ### Constructor
     RushEngine( options )
 
-**Default values:**
-- *target*: null
+**Parameters:** *options* [*object*] A literal object which accepts the following options:
 
-- *stepStart*: null
+- **target**: [*string* or *object*] The canvas element to run the engine on, being: a selector indicating a canvas element in the current document; or an element object, being an instance of `HTMLCanvasElement`.
+*Default: null*
+- **stepStart**: [*function*] A function to be run at every frame **before** the layers are drawn. Receives two parameters: `offset` (the amount of milliseconds since last frame) and `now` (the amount of milliseconds since the page started).
+*Default: null*
+- **stepEnd**: [*function*] A function to be run at every frame **after** the layers are drawn. Receives two parameters: `offset` (the amount of milliseconds since last frame) and `now` (the amount of milliseconds since the page started).
+*Default: null*
+- **layers**: [*array*] Lorem
+*Default: null*
+- **autoStart**: [*boolean*] Lorem
+*Default: true*
 
-- *stepEnd*: null
+---
+### Other methods
+These will be properly documented later (work in progress).
 
-- *layers*: null
-
-- *autoStart*: true
-
-
-#### .target( target )**
-#### .setCanvasSize(width,height)**
-#### .resetLayers( layers )**
-#### .addLayer( layer )**
-#### .removeLayer( layer )**
-#### .draw()**
-#### .start()**
-#### .step(now)**
-#### .stop()**
+- .target( target )
+- .setCanvasSize(width,height)
+- .resetLayers( layers )
+- .addLayer( layer )
+- .removeLayer( layer )
+- .draw()
+- .start()
+- .step(now)
+- .stop()
