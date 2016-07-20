@@ -50,12 +50,11 @@ And then add it to our engine:
     // Adds it to the engine
     myEngine.addLayer( canvasLayer );
 
-##Methods
+## RushLayer methods
 
-###RushLayer
+###Constructor
+    RushLayer( options )
 
-####Constructor
-	RushLayer( options )
 **Parameters:** *options* [*object*] A literal object which accepts the following options:
 
 - **source**: [*string* or *object*] A selector indicating an image or canvas element in the current document; or an element object, being either an instance of `HTMLImageElement` or `HTMLCanvasElement`.
@@ -76,7 +75,7 @@ And then add it to our engine:
 - **y**: [*number*] The vertical position of the layer, relative to the canvas size.
 *Default: 0*
 
-#### .source( [element] )
+### .source( [element] )
 Gets or sets the source element of the layer. If the "element" parameter is provided, updates the source.
 
 **Parameters**: *element* [*string* or *object*] A selector indicating an image or canvas element in the current document; or an element object, being either an instance of `HTMLImageElement` or `HTMLCanvasElement`.
@@ -84,7 +83,7 @@ Gets or sets the source element of the layer. If the "element" parameter is prov
 **Return value:** the source DOM element object of the layer. If an invalid "element" parameter is provided, returns `false`.
 
 
-#### .label( [label] )
+### .label( [label] )
 Gets or sets a label for the layer. If an string is provided as the "label" parameter, updates the label.
 
 **Parameters**: *label* [*string*] A textual label for the layer. Used mainly to search for a layer and remove it.
@@ -92,7 +91,7 @@ Gets or sets a label for the layer. If an string is provided as the "label" para
 **Return value:** the layer's label string. If an invalid parameter is provided, returns `false`.
 
 
-#### .opacity( [opacity] )
+### .opacity( [opacity] )
 Gets or sets the opacity of the layer. If the "opacity" parameter is provided, updates the opacity.
 
 **Parameters**: *opacity* [*number*] A decimal number from 0 to 1 representing the layer opacity.
@@ -100,7 +99,7 @@ Gets or sets the opacity of the layer. If the "opacity" parameter is provided, u
 **Return value:** a decimal number from 0 to 1. If an invalid parameter is provided, returns `false`.
 
 
-#### .active( [active] )
+### .active( [active] )
 Gets or sets the rendering control of the layer. If the "active" parameter is provided, updates the control.
 
 **Parameters**: *active* [*boolean*] A boolean used to turn layer rendering on (`true`) or off (`false`).
@@ -108,7 +107,7 @@ Gets or sets the rendering control of the layer. If the "active" parameter is pr
 **Return value:** a boolean representing rendering control of the layer.
 
 
-#### .position( [x, y] )
+### .position( [x, y] )
 Gets or sets the position of the layer. If **both "x" and "y"** parameters are provided, updates the position.
 
 **Parameters**: *x* and *y* [*number*] Numbers representing the the horizontal (x) and vertical (y) position of the layer, relative to the canvas size.
@@ -116,8 +115,8 @@ Gets or sets the position of the layer. If **both "x" and "y"** parameters are p
 **Return value:** a literal object containing the x and y positions of the layer.
 
 
-###RushEngine
-#### Constructor
+## RushEngine methods
+### Constructor
     RushEngine( options )
 
 **Default values:**
