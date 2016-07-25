@@ -32,6 +32,7 @@ gulp.task('watch', function () {
     gulp.watch([
         './src/*.js',
         './tests/**/*.js',
+        './tests/**/*.css',
         './tests/**/*.html'
     ], ['js-concat', 'assets', 'html']);
 });
