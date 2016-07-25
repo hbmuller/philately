@@ -162,8 +162,10 @@ var RushEngine = (function(){
         this._data.target.width = canvasWidth;
         this._data.target.height = canvasHeight;
 
-        this._data.width = canvasWidth;
-        this._data.height = canvasHeight;
+        this._data.size = {
+            width: canvasWidth,
+            height: canvasHeight
+        };
     };
 
     engine.prototype.resetLayers = function( layers ) {
@@ -203,7 +205,7 @@ var RushEngine = (function(){
 
     engine.prototype.draw = function() {
         var d = this._data;
-        d.context.clearRect(0,0, d.width, d.height);
+        d.context.clearRect(0,0, d.size.width, d.size.height);
 
         for (var i = 0, ln = d.layers.length; i < ln; i++) {
             var layer = d.layers[ i ];
@@ -238,12 +240,12 @@ var RushEngine = (function(){
             _this = this;
 
         if(typeof d.stepStart === 'function')
-            d.stepStart(offset,now);
+            d.stepStart(offset, now, d.size);
 
         this.draw();
 
         if(typeof d.stepEnd === 'function')
-            d.stepEnd(offset,now);
+            d.stepEnd(offset, now, d.size);
 
         d.lastCall = now;
 
