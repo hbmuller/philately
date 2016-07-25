@@ -245,6 +245,8 @@ var RushEngine = (function(){
         if(typeof d.stepEnd === 'function')
             d.stepEnd(offset,now);
 
+        d.lastCall = now;
+
         if( d.running )
             requestAnimationFrame(function( now ){
                 _this.step( now );
