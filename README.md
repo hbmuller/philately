@@ -123,15 +123,16 @@ Gets or sets the position of the layer. If **both "x" and "y"** parameters are p
 **Parameters:** *options* [*object*] A literal object which accepts the following options:
 
 - **target**: [*string* or *object*] The canvas element to run the engine on, being: a selector indicating a canvas element in the current document; or an element object, being an instance of `HTMLCanvasElement`.
-*Default: null*
-- **stepStart**: [*function*] A function to be run at every frame **before** the layers are drawn. Receives two parameters: `offset` (the amount of milliseconds since last frame) and `now` (the amount of milliseconds since the page started).
-*Default: null*
-- **stepEnd**: [*function*] A function to be run at every frame **after** the layers are drawn. Receives two parameters: `offset` (the amount of milliseconds since last frame) and `now` (the amount of milliseconds since the page started).
-*Default: null*
-- **layers**: [*array*] Lorem
-*Default: null*
-- **autoStart**: [*boolean*] Lorem
-*Default: true*
+- **stepStart**: [*function*] A function to be run at every frame **before** the layers are drawn. Receives three parameters:
+  - `offset`: the amount of milliseconds since last frame;
+  - `now`: the amount of milliseconds since the page started;
+  - `canvasSize`: an object with the width and height of the target canvas;
+- **stepEnd**: [*function*] A function to be run at every frame **after** the layers are drawn. Receives three parameters:
+  - `offset`: the amount of milliseconds since last frame;
+  - `now`: the amount of milliseconds since the page started;
+  - `canvasSize`: an object with the width and height of the target canvas;
+- **layers**: [*array*] An array of `RushLayer` instances to render on the target canvas
+- **autoStart**: [*boolean*] Specifyes if the rendering loop should start as soon as it's created. The default value is `true`. If set to `false`, the rendering can be manually called using the `.draw()` method.
 
 ---
 ### Other methods
