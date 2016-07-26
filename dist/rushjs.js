@@ -181,7 +181,7 @@ var RushEngine = (function(){
     engine.prototype.addLayer = function( layer ) {
         if( layer instanceof RushLayer ){
             this._data.layers.push(layer);
-            return layer;
+            return this._data.layers.length;
         } else {
             console.error( 'The "layer" parameter must be a RushLayer instance.' );
             return false;
@@ -221,19 +221,7 @@ var RushEngine = (function(){
         d.context.globalAlpha = 1;
     };
 
-    engine.prototype.start = function() {
-        var
-            now = performance.now()
-            d = this._data;
-
-        d.startedAt = now;
-        d.lastCall = now;
-        d.running = true;
-
-        this.step(now);
-    };
-
-    engine.prototype.step = function(now) {
+    engine.prototype._step = function(now) {
         var
             d = this._data,
             offset = now - d.lastCall,
@@ -251,8 +239,20 @@ var RushEngine = (function(){
 
         if( d.running )
             requestAnimationFrame(function( now ){
-                _this.step( now );
+                _this._step( now );
             });
+    };
+
+    engine.prototype.start = function() {
+        var
+            now = performance.now()
+            d = this._data;
+
+        d.startedAt = now;
+        d.lastCall = now;
+        d.running = true;
+
+        this._step(now);
     };
 
     engine.prototype.stop = function() {
