@@ -1,14 +1,14 @@
 # RushJS
 The **RushJS** library is a super easy to use rendering engine for the HTML5 `<canvas>` element. It implements layer support with a rendering loop in a super straightforward package. Great for games, interactive media or just drawing some images to the canvas.
 
-##Structure
+## Structure
 RushJS is based on two main "classes": the **RushLayer** and the **RushEngine**. They work together to create a sensible approach to working with canvas.
 
 **RushLayer** takes a source DOM element to be drawn in canvas and gives you some display controls, like opacity and position. The source can be either an `<img>` element or another `<canvas>` element, which may not need to be onscreen.
 
 **RushEngine** handles the layer stack, renders the layers and runs a rendering loop that offers callbacks both before and after the drawing process.
 
-##Getting started
+## Getting started
 A basic RushJS setup is as simple as:
 
     // An image layer, using a selector to pick the source
@@ -52,7 +52,7 @@ And then add it to our engine:
 
 ## RushLayer methods
 
-###Constructor
+### Constructor
     RushLayer( options )
 
 **Parameters:** *options* [*object*] A literal object which accepts the following options:
