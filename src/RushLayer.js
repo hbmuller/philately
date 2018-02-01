@@ -1,93 +1,95 @@
-var RushLayer = (function(){
+var RushLayer = (function() {
+  var layer = function(options) {
+    var extended = this._applyDefaults(options);
 
-    var layer = function( options ){
+    this._data = {};
+    this.source(extended.source);
+    this.opacity(extended.opacity);
+    this.label(extended.label);
+    this.active(extended.active);
+    this.position(extended.x, extended.y);
+  };
 
-        var extended = this._applyDefaults( options );
+  layer.prototype._defaults = {
+    source: null,
+    label: "",
+    opacity: 1,
+    active: true,
+    x: 0,
+    y: 0
+  };
 
-        this._data = {};
-        this.source( extended.source );
-        this.opacity( extended.opacity );
-        this.label( extended.label );
-        this.active( extended.active );
-        this.position( extended.x, extended.y );
-    };
+  layer.prototype._applyDefaults = function(options) {
+    var data = Object.create(this._defaults);
 
-    layer.prototype._defaults = {
-        'source': null,
-        'label': '',
-        'opacity': 1,
-        'active': true,
-        'x': 0,
-        'y': 0
-    };
+    for (var key in data) {
+      if (typeof options[key] !== "undefined") data[key] = options[key];
+    }
 
-    layer.prototype._applyDefaults = function( options ) {
+    return data;
+  };
 
-        var data = Object.create( this._defaults );
+  layer.prototype.source = function(source) {
+    if (source) {
+      var sourceElement =
+        typeof source === "string" ? document.querySelector(source) : source;
 
-        for ( var key in data ) {
-            if( typeof options[ key ] !== 'undefined' )
-                data[ key ] = options[ key ];
-        }
+      if (
+        sourceElement instanceof HTMLImageElement ||
+        sourceElement instanceof HTMLCanvasElement
+      ) {
+        this._data.source = sourceElement;
+      } else {
+        console.error(
+          'The "source" option must be a canvas or image element or a string selector to one of them.'
+        );
+        return false;
+      }
+    }
 
-        return data;
-    };
+    return this._data.source || null;
+  };
 
-    layer.prototype.source = function( source ) {
-        if( source ) {
-            var sourceElement = typeof source === 'string' ? document.querySelector( source ) : source;
+  layer.prototype.label = function(label) {
+    if (typeof label === "string") {
+      this._data.label = label;
+    } else if (typeof label !== "undefined") {
+      console.error('The "label" option must be a string');
+      return false;
+    }
 
-            if( sourceElement instanceof HTMLImageElement || sourceElement instanceof HTMLCanvasElement ) {
-                this._data.source = sourceElement;
-            } else {
-                console.error( 'The "source" option must be a canvas or image element or a string selector to one of them.' );
-                return false;
-            }
-        }
+    return this._data.label;
+  };
 
-        return this._data.source || null;
-    };
+  layer.prototype.opacity = function(opacity) {
+    if (typeof opacity === "number") {
+      this._data.opacity = Math.max(0, Math.min(1, opacity));
+    } else if (typeof opacity !== "undefined") {
+      console.error('The "opacity" option must be a number');
+      return false;
+    }
 
-    layer.prototype.label = function( label ) {
-        if( typeof label === 'string' ) {
-            this._data.label = label;
-        } else if( typeof label !== 'undefined' ) {
-            console.error( 'The "label" option must be a string' );
-            return false;
-        }
+    return this._data.opacity;
+  };
 
-        return this._data.label;
-    };
+  layer.prototype.active = function(active) {
+    if (typeof active === "boolean") {
+      this._data.active = active;
+    }
 
-    layer.prototype.opacity = function( opacity ) {
-        if( typeof opacity === 'number' ) {
-            this._data.opacity = Math.max( 0, Math.min( 1, opacity ) );
-        } else if( typeof opacity !== 'undefined' ) {
-            console.error( 'The "opacity" option must be a number' );
-            return false;
-        }
+    return this._data.active;
+  };
 
-        return this._data.opacity;
-    };
+  layer.prototype.position = function(x, y) {
+    if (typeof x === "number" && typeof x === "number") {
+      this._data.position = {
+        x: x,
+        y: y
+      };
+    }
 
-    layer.prototype.active = function( active ) {
-        if( typeof active === 'boolean' ) {
-            this._data.active = active;
-        }
+    return this._data.position;
+  };
 
-        return this._data.active;
-    };
-
-    layer.prototype.position = function( x, y ) {
-        if( typeof x === 'number' && typeof x === 'number' ) {
-            this._data.position = {
-                x: x,
-                y: y
-            };
-        }
-
-        return this._data.position;
-    };
-
-    return layer;
-}());
+  return layer;
+})();
