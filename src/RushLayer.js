@@ -1,95 +1,79 @@
-var RushLayer = (function() {
-  var layer = function(options) {
-    var extended = this._applyDefaults(options);
+import { isUndefined, isNumber, isString } from "lodash";
+import {
+  ERROR_INVALID_SOURCE,
+  ERROR_INVALID_LABEL,
+  ERROR_INVALID_OPACITY
+} from "./constants/messages.js";
+import { LAYER_DEFAULT_VALUES } from "./constants/layer.js";
 
-    this._data = {};
-    this.source(extended.source);
-    this.opacity(extended.opacity);
-    this.label(extended.label);
-    this.active(extended.active);
-    this.position(extended.x, extended.y);
-  };
+const getLayerSource = source => {
+  const srcElement = isString(source) ? document.querySelector(source) : source;
+  const isValidSource =
+    srcElement &&
+    (srcElement instanceof HTMLImageElement ||
+      srcElement instanceof HTMLCanvasElement);
 
-  layer.prototype._defaults = {
-    source: null,
-    label: "",
-    opacity: 1,
-    active: true,
-    x: 0,
-    y: 0
-  };
+  return isValidSource ? srcElement : null;
+};
 
-  layer.prototype._applyDefaults = function(options) {
-    var data = Object.create(this._defaults);
+class RushLayer {
+  constructor(source, { label, opacity, isActive, x, y }) {
+    const srcElement = getLayerSource(source);
 
-    for (var key in data) {
-      if (typeof options[key] !== "undefined") data[key] = options[key];
+    if (!srcElement) {
+      this.isActive = false;
+      return console.error(ERROR_INVALID_SOURCE);
     }
 
-    return data;
-  };
+    this.toggleActive(isActive);
+    this.setPosition({ x, y });
+    this.setLabel(label);
+    this.setOpacity(opacity);
+  }
 
-  layer.prototype.source = function(source) {
-    if (source) {
-      var sourceElement =
-        typeof source === "string" ? document.querySelector(source) : source;
+  toggleActive(isActive) {
+    if (isUndefined(isActive)) return this.isActive != this.isActive;
 
-      if (
-        sourceElement instanceof HTMLImageElement ||
-        sourceElement instanceof HTMLCanvasElement
-      ) {
-        this._data.source = sourceElement;
-      } else {
-        console.error(
-          'The "source" option must be a canvas or image element or a string selector to one of them.'
-        );
-        return false;
-      }
+    return (this.isActive = !!isActive);
+  }
+
+  getPosition() {
+    return this.position;
+  }
+
+  setPosition({ x, y }) {
+    if (!this.position) this.position = LAYER_DEFAULT_VALUES.position;
+    if (isNumber(x)) this.position.x = x;
+    if (isNumber(y)) this.position.y = y;
+
+    return this.position;
+  }
+
+  getLabel() {
+    return this.label;
+  }
+
+  setLabel(label) {
+    if (!isString(label)) {
+      console.error(ERROR_INVALID_LABEL);
+      return this.label;
     }
 
-    return this._data.source || null;
-  };
+    return (this.label = label);
+  }
 
-  layer.prototype.label = function(label) {
-    if (typeof label === "string") {
-      this._data.label = label;
-    } else if (typeof label !== "undefined") {
-      console.error('The "label" option must be a string');
-      return false;
+  getOpacity() {
+    return this.opacity;
+  }
+
+  setOpacity(opacity) {
+    if (!isNumber(opacity)) {
+      console.error(ERROR_INVALID_OPACITY);
+      return this.opacity;
     }
 
-    return this._data.label;
-  };
+    return (this.opacity = Math.max(0, Math.min(1, opacity)));
+  }
+}
 
-  layer.prototype.opacity = function(opacity) {
-    if (typeof opacity === "number") {
-      this._data.opacity = Math.max(0, Math.min(1, opacity));
-    } else if (typeof opacity !== "undefined") {
-      console.error('The "opacity" option must be a number');
-      return false;
-    }
-
-    return this._data.opacity;
-  };
-
-  layer.prototype.active = function(active) {
-    if (typeof active === "boolean") {
-      this._data.active = active;
-    }
-
-    return this._data.active;
-  };
-
-  layer.prototype.position = function(x, y) {
-    if (typeof x === "number" && typeof x === "number") {
-      this._data.position = {
-        x: x,
-        y: y
-      };
-    }
-
-    return this._data.position;
-  };
-
-  return layer;
-})();
+export default RushLayer;
