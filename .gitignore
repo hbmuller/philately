@@ -3,3 +3,5 @@ npm-debug.log
 
 lib
 __tests
+package-lock.json
+yarn.lock
