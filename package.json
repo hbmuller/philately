@@ -28,5 +28,8 @@
     "lodash": "^4.17.4",
     "nodemon": "^1.9.2",
     "rimraf": "^2.4.0"
+  },
+  "babel": {
+    "presets": ["env"]
   }
 }
