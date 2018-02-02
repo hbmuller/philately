@@ -1,30 +1,23 @@
 import { isUndefined, isNumber, isString } from "lodash";
 import {
+  DEFAULT_VALUES,
+  VALID_SOURCE_TYPES,
   ERROR_INVALID_SOURCE,
   ERROR_INVALID_LABEL,
   ERROR_INVALID_OPACITY
-} from "./constants/messages.js";
-import { LAYER_DEFAULT_VALUES } from "./constants/layer.js";
-
-const getLayerSource = source => {
-  const srcElement = isString(source) ? document.querySelector(source) : source;
-  const isValidSource =
-    srcElement &&
-    (srcElement instanceof HTMLImageElement ||
-      srcElement instanceof HTMLCanvasElement);
-
-  return isValidSource ? srcElement : null;
-};
+} from "./constants";
+import { getElement } from "../utils";
 
 class RushLayer {
   constructor(source, { label, opacity, isActive, x, y }) {
-    const srcElement = getLayerSource(source);
+    const srcElement = getElement(source, VALID_SOURCE_TYPES);
 
     if (!srcElement) {
       this.isActive = false;
       return console.error(ERROR_INVALID_SOURCE);
     }
 
+    this.source = srcElement;
     this.toggleActive(isActive);
     this.setPosition({ x, y });
     this.setLabel(label);
@@ -42,7 +35,7 @@ class RushLayer {
   }
 
   setPosition({ x, y }) {
-    if (!this.position) this.position = LAYER_DEFAULT_VALUES.position;
+    if (!this.position) this.position = DEFAULT_VALUES.position;
     if (isNumber(x)) this.position.x = x;
     if (isNumber(y)) this.position.y = y;
 
