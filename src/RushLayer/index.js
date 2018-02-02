@@ -1,16 +1,17 @@
-import { isUndefined, isNumber, isString } from "lodash";
+import { isUndefined, isNumber } from 'lodash';
 import {
   DEFAULT_VALUES,
   VALID_SOURCE_TYPES,
   ERROR_INVALID_SOURCE,
-  ERROR_INVALID_LABEL,
-  ERROR_INVALID_OPACITY
-} from "./constants";
-import { getElement } from "../utils";
+  ERROR_INVALID_OPACITY,
+} from './constants';
+import { getElement } from '../utils';
 
 class RushLayer {
   constructor(source, config) {
-    const { label, opacity, isActive, x, y } = { ...DEFAULT_VALUES, ...config };
+    const {
+      opacity, isActive, x, y,
+    } = { ...DEFAULT_VALUES, ...config };
     const srcElement = getElement(source, VALID_SOURCE_TYPES);
 
     if (!srcElement) {
@@ -21,14 +22,17 @@ class RushLayer {
     this.source = srcElement;
     this.toggleActive(isActive);
     this.setPosition({ x, y });
-    this.setLabel(label);
     this.setOpacity(opacity);
   }
 
   toggleActive(isActive) {
-    if (isUndefined(isActive)) return this.isActive != this.isActive;
+    if (isUndefined(isActive)) {
+      this.isActive = !this.isActive;
+    } else {
+      this.isActive = !!isActive;
+    }
 
-    return (this.isActive = !!isActive);
+    return this.isActive;
   }
 
   getPosition() {
@@ -43,19 +47,6 @@ class RushLayer {
     return this.position;
   }
 
-  getLabel() {
-    return this.label;
-  }
-
-  setLabel(label) {
-    if (!isString(label)) {
-      console.error(ERROR_INVALID_LABEL);
-      return this.label;
-    }
-
-    return (this.label = label);
-  }
-
   getOpacity() {
     return this.opacity;
   }
@@ -66,7 +57,9 @@ class RushLayer {
       return this.opacity;
     }
 
-    return (this.opacity = Math.max(0, Math.min(1, opacity)));
+    this.opacity = Math.max(0, Math.min(1, opacity));
+
+    return this.opacity;
   }
 }
 
