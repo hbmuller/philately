@@ -9,20 +9,14 @@
     "type": "git",
     "url": "git+https://github.com/hbmuller/rush-js.git"
   },
-  "keywords": [
-    "html5",
-    "canvas",
-    "animation",
-    "layers",
-    "engine",
-    "renderer"
-  ],
+  "keywords": ["html5", "canvas", "animation", "layers", "engine", "renderer"],
   "scripts": {
     "build": "rimraf lib && babel src -d lib",
     "build:watch": "nodemon --exec 'npm run build' --ignore lib"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "babel-preset-es2015": "^6.24.1",
     "lodash": "^4.17.4",
@@ -30,6 +24,7 @@
     "rimraf": "^2.4.0"
   },
   "babel": {
-    "presets": ["env"]
+    "presets": ["env"],
+    "plugins": ["transform-object-rest-spread"]
   }
 }

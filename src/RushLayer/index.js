@@ -9,7 +9,8 @@ import {
 import { getElement } from "../utils";
 
 class RushLayer {
-  constructor(source, { label, opacity, isActive, x, y }) {
+  constructor(source, config) {
+    const { label, opacity, isActive, x, y } = { ...DEFAULT_VALUES, ...config };
     const srcElement = getElement(source, VALID_SOURCE_TYPES);
 
     if (!srcElement) {
