@@ -26,5 +26,6 @@
   "babel": {
     "presets": ["env"],
     "plugins": ["transform-object-rest-spread"]
-  }
+  },
+  "prettier": { "printWidth": 100 }
 }

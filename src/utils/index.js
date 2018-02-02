@@ -1,5 +1,7 @@
-import getElement from './getElement';
+import getElement from "./getElement";
+import isValidType from "./isValidType";
 
 export default {
-  getElement
+  getElement,
+  isValidType
 };
