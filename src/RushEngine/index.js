@@ -1,28 +1,31 @@
 import { isArray, isFunction, isNumber } from 'lodash';
 import {
   DEFAULT_VALUES,
-  VALID_TARGET_TYPES,
   ERROR_INVALID_TARGET,
   ERROR_INVALID_LAYER,
   ERROR_LAYER_NOT_FOUND,
 } from './constants';
-import { getElement } from '../utils';
+import { getTargetElement } from '../utils';
 import RushLayer from '../RushLayer';
 
 class RushEngine {
   constructor(target, config) {
-    const targetElement = getElement(target, VALID_TARGET_TYPES);
     const { stepStart, layers, autoStart } = { ...DEFAULT_VALUES, ...config };
 
+
+    this.resetLayers(layers);
+    this.setStepStart(stepStart);
+    if (autoStart) this.start();
+  }
+
+  setTarget(target) {
+    const targetElement = getTargetElement(target);
     if (!targetElement) return console.error(ERROR_INVALID_TARGET);
 
     this.target = targetElement;
     this.context = targetElement.getContext('2d');
     this.setCanvasSize();
 
-    this.resetLayers(layers);
-    this.setStepStart(stepStart);
-    if (autoStart) this.start();
   }
 
   resetLayers(layers) {
