@@ -1,5 +1,1 @@
-import getElement from './getElement';
-
-export default {
-  getElement,
-};
+export * from './getElement';

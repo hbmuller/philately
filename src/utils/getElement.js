@@ -1,12 +1,14 @@
-import { isArray, isString } from 'lodash';
+import { isArray, isString } from "lodash";
+import { VALID_TARGET_TYPES, VALID_SOURCE_TYPES } from "../constants";
 
-export default (target, validTypes) => {
+const isValidType = (element, validTypes) => validTypes.some(type => element instanceof type);
+
+const getElement = (target, validTypes) => {
   const element = isString(target) ? document.querySelector(target) : target;
-  const noElement = !element || !(element instanceof HTMLElement);
-  const isInvalid =
-    noElement || (isArray(validTypes) && !validTypes.some(type => element instanceof type));
 
-  if (noElement || isInvalid) return null;
-
-  return element;
+  return element && isValidType(element, validTypes) ? element : null;
 };
+
+export const getTargetElement = element => getElement(element, VALID_TARGET_TYPES);
+
+export const getSourceElement = element => getElement(element, VALID_SOURCE_TYPES);

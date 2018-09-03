@@ -4,7 +4,6 @@ export const DEFAULT_VALUES = {
   position: { x: 0, y: 0 },
 };
 
-export const VALID_SOURCE_TYPES = [HTMLImageElement, HTMLCanvasElement];
 
 export const ERROR_INVALID_SOURCE =
   'The "source" value must be a canvas or image element or a string selector to one of them.';
