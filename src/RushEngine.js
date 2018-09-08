@@ -3,7 +3,9 @@ import {
   DEFAULT_ENGINE_CONFIG,
   ERROR_INVALID_TARGET,
   ERROR_INVALID_LAYER,
-  ERROR_LAYER_NOT_FOUND
+  ERROR_LAYER_NOT_FOUND,
+  ERROR_INVALID_ONTICK_CALLBACK,
+  ERROR_INVALID_LAYER_ARRAY
 } from "./constants";
 import { getTargetElement } from "./utils";
 import RushLayer from "./RushLayer";
@@ -32,7 +34,7 @@ class RushEngine {
   }
 
   setLayers(layers) {
-    if (!isArray(layers)) return console.error("TODO: not a layer array");
+    if (!isArray(layers)) return console.error(ERROR_INVALID_LAYER_ARRAY);
 
     this.layers = [];
     layers.forEach(layer => this.addLayer(layer));
@@ -52,7 +54,7 @@ class RushEngine {
   }
 
   setOnTick(onTick) {
-    if (!isFunction(onTick)) return console.error("TODO: onTick is not a function");
+    if (!isFunction(onTick)) return console.error(ERROR_INVALID_ONTICK_CALLBACK);
 
     this.onTick = onTick;
   }
