@@ -1,1 +1,1 @@
-export * from './getElement';
+export * from "./getElement";

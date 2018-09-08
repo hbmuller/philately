@@ -1,17 +1,15 @@
-import { isUndefined, isNumber } from 'lodash';
+import { isUndefined, isNumber } from "lodash";
 import {
   DEFAULT_VALUES,
   VALID_SOURCE_TYPES,
   ERROR_INVALID_SOURCE,
-  ERROR_INVALID_OPACITY,
-} from './constants';
-import { getElement } from '../utils';
+  ERROR_INVALID_OPACITY
+} from "./constants";
+import { getElement } from "../utils";
 
 class RushLayer {
   constructor(source, config) {
-    const {
-      opacity, isActive, x, y,
-    } = { ...DEFAULT_VALUES, ...config };
+    const { opacity, isActive, x, y } = { ...DEFAULT_VALUES, ...config };
     const srcElement = getElement(source, VALID_SOURCE_TYPES);
 
     if (!srcElement) {
