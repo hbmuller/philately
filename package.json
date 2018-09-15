@@ -18,31 +18,21 @@
     "renderer"
   ],
   "scripts": {
-    "build": "rimraf lib && babel src -d lib",
+    "build": "rimraf lib && babel src/ --out-dir lib",
     "build:watch": "nodemon --exec 'npm run build' --ignore lib",
     "lint": "eslint src"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
+    "babel-eslint": "^8.2.6",
+    "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-preset-env": "^1.6.1",
-    "babel-preset-es2015": "^6.24.1",
-    "eslint": "^4.16.0",
-    "eslint-config-airbnb-base": "^12.1.0",
-    "eslint-plugin-import": "^2.8.0",
+    "babel-preset-env": "^1.7.0",
+    "eslint": "^4.19.1",
+    "eslint-plugin-prettier": "^2.6.2",
     "nodemon": "^1.9.2",
+    "prettier": "^1.14.2",
     "rimraf": "^2.4.0"
-  },
-  "babel": {
-    "presets": [
-      "env"
-    ],
-    "plugins": [
-      "transform-object-rest-spread"
-    ]
-  },
-  "prettier": {
-    "printWidth": 100
   },
   "dependencies": {
     "lodash": "^4.17.4"

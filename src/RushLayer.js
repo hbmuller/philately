@@ -1,10 +1,5 @@
-import { isUndefined, isNumber } from 'lodash';
-import {
-  DEFAULT_LAYER_CONFIG,
-  VALID_SOURCE_TYPES,
-  ERROR_INVALID_SOURCE,
-  ERROR_INVALID_OPACITY,
-} from './constants';
+import { isNumber } from 'lodash';
+import { DEFAULT_LAYER_CONFIG, ERROR_INVALID_SOURCE } from './constants';
 import { getSourceElement } from './utils';
 
 class RushLayer {
@@ -25,17 +20,29 @@ class RushLayer {
 
     if (!sourceElement) {
       this.setActive(false);
-      return console.error(ERROR_INVALID_SOURCE);
+      console.error(ERROR_INVALID_SOURCE);
+
+      return null;
     }
 
-    return (this.source = sourceElement);
+    this.source = sourceElement;
+
+    return this.source;
   }
 
   getActive = () => this.isActive;
 
-  setActive = (isActive = true) => (this.isActive = !!isActive);
+  setActive = (isActive = true) => {
+    this.isActive = !!isActive;
 
-  toggleActive = () => (this.isActive = !this.isActive);
+    return this.isActive;
+  };
+
+  toggleActive = () => {
+    this.isActive = !this.isActive;
+
+    return this.isActive;
+  };
 
   getPosition = () => this.position;
 
@@ -48,8 +55,11 @@ class RushLayer {
 
   getOpacity = () => this.opacity;
 
-  setOpacity = opacity =>
-    (this.opacity = isNumber(opacity) ? Math.max(0, Math.min(1, opacity)) : this.opacity);
+  setOpacity = opacity => {
+    if (isNumber(opacity)) this.opacity = Math.max(0, Math.min(1, opacity));
+
+    return this.opacity;
+  };
 }
 
 export default RushLayer;

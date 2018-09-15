@@ -1,5 +1,5 @@
-import { isArray, isString } from "lodash";
-import { VALID_TARGET_TYPES, VALID_SOURCE_TYPES } from "../constants";
+import { isString } from 'lodash';
+import { VALID_TARGET_TYPES, VALID_SOURCE_TYPES } from '../constants';
 
 const isValidType = (element, validTypes) => validTypes.some(type => element instanceof type);
 

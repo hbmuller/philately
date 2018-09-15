@@ -1,14 +1,14 @@
-import { isArray, isFunction, isNumber } from "lodash";
+import { isArray, isFunction, isNumber } from 'lodash';
 import {
   DEFAULT_ENGINE_CONFIG,
   ERROR_INVALID_TARGET,
   ERROR_INVALID_LAYER,
   ERROR_LAYER_NOT_FOUND,
   ERROR_INVALID_ONTICK_CALLBACK,
-  ERROR_INVALID_LAYER_ARRAY
-} from "./constants";
-import { getTargetElement } from "./utils";
-import RushLayer from "./RushLayer";
+  ERROR_INVALID_LAYER_ARRAY,
+} from './constants';
+import { getTargetElement } from './utils';
+import RushLayer from './RushLayer';
 
 class RushEngine {
   constructor(config) {
@@ -29,7 +29,7 @@ class RushEngine {
     if (!targetElement) return console.error(ERROR_INVALID_TARGET);
 
     this.target = targetElement;
-    this.context = targetElement.getContext("2d");
+    this.context = targetElement.getContext('2d');
     this.setCanvasSize();
   }
 
@@ -69,7 +69,7 @@ class RushEngine {
     this.runData = {
       start,
       lastCall: start,
-      running: true
+      running: true,
     };
 
     this.step(now);
@@ -82,7 +82,7 @@ class RushEngine {
   setCanvasSize({ width, height } = {}) {
     this.canvasSize = {
       width: isNumber(width) ? width : this.target.clientWidth,
-      height: isNumber(height) ? height : this.target.clientHeight
+      height: isNumber(height) ? height : this.target.clientHeight,
     };
 
     this.target.width = this.canvasSize.width;
