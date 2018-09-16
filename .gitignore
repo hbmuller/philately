@@ -2,6 +2,7 @@ node_modules
 npm-debug.log
 
 lib
+dist
 __tests
 package-lock.json
 yarn.lock
