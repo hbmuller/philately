@@ -32,36 +32,42 @@ class RushLayer {
     return this.source;
   }
 
-  getActive = () => this.isActive;
+  getActive() {
+    return this.isActive;
+  }
 
-  setActive = (isActive = true) => {
+  setActive(isActive = true) {
     this.isActive = !!isActive;
 
     return this.isActive;
-  };
+  }
 
-  toggleActive = () => {
+  toggleActive() {
     this.isActive = !this.isActive;
 
     return this.isActive;
-  };
+  }
 
-  getPosition = () => this.position;
+  getPosition() {
+    return this.position;
+  }
 
-  setPosition = ({ x, y }) => {
+  setPosition({ x, y }) {
     if (isNumber(x)) this.position.x = x;
     if (isNumber(y)) this.position.y = y;
 
     return this.position;
-  };
+  }
 
-  getOpacity = () => this.opacity;
+  getOpacity() {
+    return this.opacity;
+  }
 
-  setOpacity = opacity => {
+  setOpacity(opacity) {
     if (isNumber(opacity)) this.opacity = Math.max(0, Math.min(1, opacity));
 
     return this.opacity;
-  };
+  }
 }
 
 export default RushLayer;
