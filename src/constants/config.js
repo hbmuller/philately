@@ -1,6 +1,7 @@
 export const DEFAULT_ENGINE_CONFIG = {
   layers: [],
   autoStart: true,
+  onTick: () => {},
 };
 
 export const DEFAULT_LAYER_CONFIG = {

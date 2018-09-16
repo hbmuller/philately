@@ -3,6 +3,8 @@ import { DEFAULT_LAYER_CONFIG, ERROR_INVALID_SOURCE } from './constants';
 import { getSourceElement } from './utils';
 
 class RushLayer {
+  position = DEFAULT_LAYER_CONFIG.position;
+
   constructor(config) {
     const { source, opacity, isActive, x, y } = { ...DEFAULT_LAYER_CONFIG, ...config };
 

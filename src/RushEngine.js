@@ -72,7 +72,7 @@ class RushEngine {
       running: true,
     };
 
-    this.step(now);
+    this.step(start);
   }
 
   stop() {
