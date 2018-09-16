@@ -1,14 +1,22 @@
 import { isString } from 'lodash';
-import { VALID_TARGET_TYPES, VALID_SOURCE_TYPES } from '../constants';
+import { imageLoader, getElementInfo } from '.';
 
-const isValidType = (element, validTypes) => validTypes.some(type => element instanceof type);
+const isValidElement = (element, validTypes) =>
+  element && validTypes.some(type => element instanceof type);
 
-const getElement = (target, validTypes) => {
-  const element = isString(target) ? document.querySelector(target) : target;
+const resolveValidElement = (selector, validTypes) => {
+  const element = isString(selector) ? document.querySelector(selector) : selector;
 
-  return element && isValidType(element, validTypes) ? element : null;
+  return isValidElement(element, validTypes) ? element : null;
 };
 
-export const getTargetElement = element => getElement(element, VALID_TARGET_TYPES);
+export const getElement = (...params) => getElementInfo(resolveValidElement(...params));
 
-export const getSourceElement = element => getElement(element, VALID_SOURCE_TYPES);
+export const getAsyncElement = (...params) => {
+  const element = resolveValidElement(...params);
+
+  if (element instanceof HTMLImageElement) return imageLoader(element);
+  if (element instanceof HTMLCanvasElement) return Promise.resolve(getElementInfo(element));
+
+  return Promise.reject();
+};

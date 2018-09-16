@@ -1,35 +1,34 @@
 import { isNumber } from 'lodash';
-import { DEFAULT_LAYER_CONFIG, ERROR_INVALID_SOURCE } from './constants';
-import { getSourceElement } from './utils';
+import { DEFAULT_LAYER_CONFIG, VALID_SOURCE_TYPES, ERROR_INVALID_SOURCE } from './constants';
+import { createSource, getAsyncElement } from './utils';
 
 class RushLayer {
   position = DEFAULT_LAYER_CONFIG.position;
 
   constructor(config) {
-    const { source, opacity, isActive, x, y } = { ...DEFAULT_LAYER_CONFIG, ...config };
+    const { imageSrc, source, opacity, isActive, x, y } = { ...DEFAULT_LAYER_CONFIG, ...config };
 
-    this.setSource(source);
+    this.setPosition({ x, y });
+    this.setOpacity(opacity);
+    this.setActive(false);
 
-    if (this.source) {
-      this.setActive(isActive);
-      this.setPosition({ x, y });
-      this.setOpacity(opacity);
+    if (imageSrc) {
+      this.setAsyncSource(createSource(imageSrc), isActive);
+    } else if (source) {
+      this.setAsyncSource(getAsyncElement(source, VALID_SOURCE_TYPES), isActive);
     }
   }
 
-  setSource(source) {
-    const sourceElement = getSourceElement(source);
+  setAsyncSource(sourcePromise, isActive) {
+    return sourcePromise
+      .then(({ element, ...size }) => {
+        this.source = element;
+        this.size = size;
+        this.setActive(isActive);
 
-    if (!sourceElement) {
-      this.setActive(false);
-      console.error(ERROR_INVALID_SOURCE);
-
-      return null;
-    }
-
-    this.source = sourceElement;
-
-    return this.source;
+        return element;
+      })
+      .catch(() => new Error(ERROR_INVALID_SOURCE));
   }
 
   getActive() {
@@ -50,6 +49,10 @@ class RushLayer {
 
   getPosition() {
     return this.position;
+  }
+
+  getSize() {
+    return this.size;
   }
 
   setPosition({ x, y }) {

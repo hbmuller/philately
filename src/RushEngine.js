@@ -6,8 +6,10 @@ import {
   ERROR_LAYER_NOT_FOUND,
   ERROR_INVALID_ONTICK_CALLBACK,
   ERROR_INVALID_LAYER_ARRAY,
+  VALID_TARGET_TYPES,
 } from './constants';
-import { getTargetElement } from './utils';
+
+import { getElement } from './utils';
 import RushLayer from './RushLayer';
 
 class RushEngine {
@@ -15,21 +17,19 @@ class RushEngine {
     const { target, layers, onTick, autoStart } = { ...DEFAULT_ENGINE_CONFIG, ...config };
 
     this.setTarget(target);
+    this.setLayers(layers);
+    this.setOnTick(onTick);
 
-    if (this.target) {
-      this.setLayers(layers);
-      this.setOnTick(onTick);
-      if (autoStart) this.start();
-    }
+    if (this.target && autoStart) this.start();
   }
 
   setTarget(target) {
-    const targetElement = getTargetElement(target);
+    const { element } = getElement(target, VALID_TARGET_TYPES);
 
-    if (!targetElement) return console.error(ERROR_INVALID_TARGET);
+    if (!element) return console.error(ERROR_INVALID_TARGET);
 
-    this.target = targetElement;
-    this.context = targetElement.getContext('2d');
+    this.target = element;
+    this.context = element.getContext('2d');
     this.setCanvasSize();
   }
 
