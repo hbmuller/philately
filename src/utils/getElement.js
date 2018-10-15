@@ -1,4 +1,4 @@
-import { isString } from 'lodash';
+import isString from 'lodash/isString';
 import { imageLoader, getElementInfo } from '.';
 
 const isValidElement = (element, validTypes) =>

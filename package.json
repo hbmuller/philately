@@ -1,13 +1,13 @@
 {
-  "name": "rushjs",
+  "name": "philately",
   "version": "0.2.0",
   "description": "A rendering engine for HTML5 canvas with layer support.",
-  "main": "dist/rushjs.js",
+  "main": "lib/index.js",
   "author": "Henrique Müller <hbmuller@gmail.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hbmuller/rush-js.git"
+    "url": "git+https://github.com/hbmuller/philately.git"
   },
   "keywords": [
     "html5",

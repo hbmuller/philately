@@ -1,8 +1,8 @@
-import { isNumber } from 'lodash';
+import isNumber from 'lodash/isNumber';
 import { DEFAULT_LAYER_CONFIG, VALID_SOURCE_TYPES, ERROR_INVALID_SOURCE } from './constants';
 import { createSource, getAsyncElement } from './utils';
 
-class RushLayer {
+class Layer {
   position = { ...DEFAULT_LAYER_CONFIG.position };
 
   constructor(config) {
@@ -73,4 +73,4 @@ class RushLayer {
   }
 }
 
-export default RushLayer;
+export default Layer;

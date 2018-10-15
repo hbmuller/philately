@@ -1,4 +1,6 @@
-import { isArray, isFunction, isNumber } from 'lodash';
+import isArray from 'lodash/isArray';
+import isFunction from 'lodash/isFunction';
+import isNumber from 'lodash/isNumber';
 import {
   DEFAULT_ENGINE_CONFIG,
   ERROR_INVALID_TARGET,
@@ -10,9 +12,9 @@ import {
 } from './constants';
 
 import { getElement } from './utils';
-import RushLayer from './RushLayer';
+import Layer from './Layer';
 
-class RushEngine {
+class Engine {
   constructor(config) {
     const { target, layers, onTick, autoStart } = { ...DEFAULT_ENGINE_CONFIG, ...config };
 
@@ -46,7 +48,7 @@ class RushEngine {
   }
 
   addLayer(layer) {
-    if (!layer instanceof RushLayer) return console.warn(ERROR_INVALID_LAYER);
+    if (!layer instanceof Layer) return console.warn(ERROR_INVALID_LAYER);
 
     this.layers = [...this.layers, layer];
   }
@@ -118,4 +120,4 @@ class RushEngine {
   }
 }
 
-export default RushEngine;
+export default Engine;
