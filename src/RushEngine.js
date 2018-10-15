@@ -20,7 +20,12 @@ class RushEngine {
     this.setLayers(layers);
     this.setOnTick(onTick);
 
-    if (this.target && autoStart) this.start();
+    if (this.target && this.layers)
+      Promise.all(this.layers.map(layer => layer.promise)).then(() => {
+        if (autoStart) return this.start();
+
+        this.draw();
+      });
   }
 
   setTarget(target) {

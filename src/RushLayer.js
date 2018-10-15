@@ -3,7 +3,7 @@ import { DEFAULT_LAYER_CONFIG, VALID_SOURCE_TYPES, ERROR_INVALID_SOURCE } from '
 import { createSource, getAsyncElement } from './utils';
 
 class RushLayer {
-  position = DEFAULT_LAYER_CONFIG.position;
+  position = { ...DEFAULT_LAYER_CONFIG.position };
 
   constructor(config) {
     const { imageSrc, source, opacity, isActive, x, y } = { ...DEFAULT_LAYER_CONFIG, ...config };
