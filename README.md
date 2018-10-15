@@ -1,33 +1,63 @@
 # Philately
 
-The **Philately** library is a super easy to use rendering engine for the HTML5 `<canvas>` element. It implements layer support with a rendering loop in a super straightforward package. Great for games, interactive media or just drawing some images to the canvas.
+Philately is a super easy to use rendering engine for HTML5 `<canvas>`. You have a renderer, some layers and that's all. Simple as that. Great for games, interactive media or just drawing some images to the canvas.
+
+```javascript
+import { Engine, Layer } from 'philately';
+
+const myLayer = new Layer({ imageSrc: './myAwesomeImage.png' });
+
+const myEngine = new Engine({
+  target: '#my-canvas-element',
+  layers: [myLayer],
+});
+
+// Boom! You've got it working!
+```
 
 ⚠️ **The library has just been refactored into ES6, adding some new features. So, these docs might not be accurate. The documentation update is already on the way.** ⚠️
 
 ## Structure
 
-Philately is based on two main "classes": the **Layer** and the **Engine**. They work together to create a sensible approach to working with canvas.
+Philately is made out of two modules: **Layer** and **Engine**. They work together to create a sensible approach to working with canvas.
 
-**Layer** takes a source DOM element to be drawn in canvas and gives you some display controls, like opacity and position. The source can be either an `<img>` element or another `<canvas>` element, which may not need to be onscreen.
+**Layer** takes an image URL (or base64) or an element (like `<img>` or `<canvas>`) as source to be drawn by the engine. It also gives you some display controls, like opacity and position.
 
-**Engine** handles the layer stack, renders the layers and runs a rendering loop that offers callbacks both before and after the drawing process.
+**Engine** handles a layer stack, and renders it to a target `<canvas>`. It render the layers in a loop, while offering a pre-rendering hook.
 
 ## Getting started
 
 A basic Philately setup is as simple as:
 
 ```javascript
-// An image layer, using a selector to pick the source
-var myLayer = new Layer({ source: '.my-image' });
+import { Engine, Layer } from 'philately';
 
-// The actual engine
-var myEngine = new Engine({
-  target: '.my-canvas',
-  layers: [myLayer],
+// Layers load asyncronously. So, don't worry about images not being ready.
+const myImage = new Layer({ imageSrc: './myAwesomeImage.png', x: 100, y: 100, opacity: 0.5 });
+const myCanvas = new Layer({ source: '.onscreen-canvas', isActive: false });
+
+const myEngine = new Engine({
+  target: '#target',
+  layers: [myImage, myCanvas],
 });
 ```
 
-This will start the engine with the layer being drawn at the top left of the target canvas.
+The image will be rendered as soon as it loads and the second layer will be skipped.
+
+Don't worry about waiting for images to load. The engine will wait for all layers to resolve before the first render.
+
+```javascript
+import { Engine, Layer } from 'philately';
+
+const myEngine = new Engine({
+  target: '#my-target',
+  layers: [
+    new Layer({ imageSrc: 'path/to/image_01.png' }),
+    new Layer({ imageSrc: 'path/to/image_02.png' }),
+    new Layer({ imageSrc: 'path/to/image_03.png' }),
+  ],
+});
+```
 
 We could create an offscreen canvas:
 
