@@ -5,7 +5,7 @@ export const DEFAULT_ENGINE_CONFIG = {
 };
 
 export const DEFAULT_LAYER_CONFIG = {
-  active: true,
+  isActive: true,
   opacity: 1,
   position: { x: 0, y: 0 },
 };

@@ -22,12 +22,13 @@ class Engine {
     this.setLayers(layers);
     this.setOnTick(onTick);
 
-    if (this.target && this.layers)
-      Promise.all(this.layers.map(layer => layer.promise)).then(() => {
+    if (this.target && this.layers && this.layers.length) {
+      Promise.all(this.layers.map(layer => layer.sourcePromise)).then(() => {
         if (autoStart) return this.start();
 
         this.draw();
       });
+    }
   }
 
   setTarget(target) {
@@ -113,6 +114,8 @@ class Engine {
 
     this.layers.forEach(layer => {
       if (layer.isActive && layer.opacity) {
+        console.log(layer);
+
         this.context.globalAlpha = layer.opacity;
         this.context.drawImage(layer.source, layer.position.x, layer.position.y);
       }

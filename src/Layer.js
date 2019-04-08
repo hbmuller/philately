@@ -3,71 +3,79 @@ import { DEFAULT_LAYER_CONFIG, VALID_SOURCE_TYPES, ERROR_INVALID_SOURCE } from '
 import { createSource, getAsyncElement } from './utils';
 
 class Layer {
-  position = { ...DEFAULT_LAYER_CONFIG.position };
+  _config = {
+    position: { ...DEFAULT_LAYER_CONFIG.position },
+    isActive: false,
+  };
 
   constructor(config) {
     const { imageSrc, source, opacity, isActive, x, y } = { ...DEFAULT_LAYER_CONFIG, ...config };
 
-    this.setPosition({ x, y });
-    this.setOpacity(opacity);
-    this.setActive(false);
+    this.position = { x, y };
+    this.opacity = opacity;
 
     if (imageSrc) {
-      this.setAsyncSource(createSource(imageSrc), isActive);
+      this.setSource(createSource(imageSrc), isActive);
     } else if (source) {
-      this.setAsyncSource(getAsyncElement(source, VALID_SOURCE_TYPES), isActive);
+      this.setSource(getAsyncElement(source, VALID_SOURCE_TYPES), isActive);
     }
   }
 
-  setAsyncSource(sourcePromise, isActive) {
-    return sourcePromise
+  setSource(sourcePromise, isActive = DEFAULT_LAYER_CONFIG.isActive) {
+    this._config.sourcePromise = sourcePromise
       .then(({ element, ...size }) => {
-        this.source = element;
-        this.size = size;
-        this.setActive(isActive);
+        this._config.source = element;
+        this._config.size = size;
+        this._config.isActive = isActive;
 
         return element;
       })
       .catch(() => new Error(ERROR_INVALID_SOURCE));
   }
 
-  getActive() {
-    return this.isActive;
+  get sourcePromise() {
+    return this._config.sourcePromise;
   }
 
-  setActive(isActive = true) {
-    this.isActive = !!isActive;
-
-    return this.isActive;
+  get source() {
+    return this._config.source;
   }
 
-  toggleActive() {
+  get isActive() {
+    return this._config.isActive;
+  }
+
+  set isActive(isActive) {
+    this._config.isActive = !!isActive;
+  }
+
+  toggle() {
     this.isActive = !this.isActive;
 
     return this.isActive;
   }
 
-  getPosition() {
+  get size() {
+    return this._config.size;
+  }
+
+  get position() {
+    return { ...this._config.position };
+  }
+
+  set position({ x, y }) {
+    if (isNumber(x)) this._config.position.x = x;
+    if (isNumber(y)) this._config.position.y = y;
+
     return this.position;
   }
 
-  getSize() {
-    return this.size;
+  get opacity() {
+    return this._config.opacity;
   }
 
-  setPosition({ x, y }) {
-    if (isNumber(x)) this.position.x = x;
-    if (isNumber(y)) this.position.y = y;
-
-    return this.position;
-  }
-
-  getOpacity() {
-    return this.opacity;
-  }
-
-  setOpacity(opacity) {
-    if (isNumber(opacity)) this.opacity = Math.max(0, Math.min(1, opacity));
+  set opacity(opacity) {
+    if (isNumber(opacity)) this._config.opacity = Math.max(0, Math.min(1, opacity));
 
     return this.opacity;
   }
