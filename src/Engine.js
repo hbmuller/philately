@@ -15,6 +15,8 @@ import { getElement } from './utils';
 import Layer from './Layer';
 
 class Engine {
+  #config = {};
+
   constructor(config) {
     const { target, layers, onTick, autoStart } = { ...DEFAULT_ENGINE_CONFIG, ...config };
 
@@ -114,10 +116,8 @@ class Engine {
 
     this.layers.forEach(layer => {
       if (layer.isActive && layer.opacity) {
-        console.log(layer);
-
         this.context.globalAlpha = layer.opacity;
-        this.context.drawImage(layer.source, layer.position.x, layer.position.y);
+        this.context.drawImage(layer.source, layer.posX, layer.posY);
       }
     });
   }
