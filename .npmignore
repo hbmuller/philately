@@ -4,3 +4,5 @@ node_modules
 .gitignore
 .prettierrc.json
 src
+yarn-error.log
+yarn.lock
