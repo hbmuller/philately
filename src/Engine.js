@@ -1,12 +1,11 @@
 import isArray from 'lodash/isArray';
 import isFunction from 'lodash/isFunction';
-import isNumber from 'lodash/isNumber';
 import {
-  DEFAULT_ENGINE_CONFIG,
+  DEFAULT_ENGINE_OPTIONS,
   ERROR_INVALID_TARGET,
   ERROR_INVALID_LAYER,
   ERROR_LAYER_NOT_FOUND,
-  ERROR_INVALID_ONTICK_CALLBACK,
+  ERROR_INVALID_ONSTEP_CALLBACK,
   ERROR_INVALID_LAYER_ARRAY,
   VALID_TARGET_TYPES,
 } from './constants';
@@ -15,109 +14,153 @@ import { getElement } from './utils';
 import Layer from './Layer';
 
 class Engine {
-  #config = {};
+  #config = {
+    target: null,
+    context: null,
+    isRunning: false,
+    initialTime: null,
+    lastCallTime: null,
+  };
 
-  constructor(config) {
-    const { target, layers, onTick, autoStart } = { ...DEFAULT_ENGINE_CONFIG, ...config };
+  constructor(options) {
+    const { target, layers, onStep, autoStart, autoResize } = {
+      ...DEFAULT_ENGINE_OPTIONS,
+      ...options,
+    };
 
-    this.setTarget(target);
-    this.setLayers(layers);
-    this.setOnTick(onTick);
+    this.autoResize = autoResize;
+    this.layers = layers;
+    this.onStep = onStep;
+    this.target = target;
 
-    if (this.target && this.layers && this.layers.length) {
+    if (this.target && this.layers.length)
       Promise.all(this.layers.map(layer => layer.sourcePromise)).then(() => {
         if (autoStart) return this.start();
 
         this.draw();
       });
-    }
   }
 
-  setTarget(target) {
-    const { element } = getElement(target, VALID_TARGET_TYPES);
+  get target() {
+    return this.#config.target;
+  }
+
+  set target(selector) {
+    if (!selector) return;
+
+    const { element } = getElement(selector, VALID_TARGET_TYPES);
 
     if (!element) return console.error(ERROR_INVALID_TARGET);
 
-    this.target = element;
-    this.context = element.getContext('2d');
-    this.setCanvasSize();
+    this.#config.target = element;
+    this.#config.context = element.getContext('2d');
+
+    if (this.autoResize) this.#resetTargetSize();
   }
 
-  setLayers(layers) {
-    if (!isArray(layers)) return console.error(ERROR_INVALID_LAYER_ARRAY);
+  get layers() {
+    return [...this.#config.layers];
+  }
 
-    this.layers = [];
-    layers.forEach(layer => this.addLayer(layer));
+  set layers(newLayers) {
+    if (!isArray(newLayers)) return console.error(ERROR_INVALID_LAYER_ARRAY);
+
+    this.#config.layers = [];
+    newLayers.forEach(layer => this.addLayer(layer));
   }
 
   addLayer(layer) {
     if (!layer instanceof Layer) return console.warn(ERROR_INVALID_LAYER);
 
-    this.layers = [...this.layers, layer];
+    this.#config.layers = [...this.#config.layers, layer];
   }
 
   removeLayer(layer) {
     const index = this.layers.indexOf(layer);
     if (index < 0) return console.warn(ERROR_LAYER_NOT_FOUND);
 
-    this.layers = [...this.layers.slice(0, index), ...this.layers.slice(index + 1)];
+    this.#config.layers = [...this.layers.slice(0, index), ...this.layers.slice(index + 1)];
   }
 
-  setOnTick(onTick) {
-    if (!isFunction(onTick)) return console.error(ERROR_INVALID_ONTICK_CALLBACK);
+  #resetTargetSize = () => {
+    if (!this.target) return;
 
-    this.onTick = onTick;
+    this.target.width = this.target.clientWidth;
+    this.target.height = this.target.clientHeight;
+
+    this.draw();
+  };
+
+  get autoResize() {
+    return this.#config.autoResize;
   }
 
-  clearOnTick() {
-    this.onTick = null;
+  set autoResize(value) {
+    const autoResize = !!value;
+
+    if (autoResize && !this.autoResize) window.addEventListener('resize', this.#resetTargetSize);
+    if (!autoResize && this.autoResize) window.removeEventListener('resize', this.#resetTargetSize);
+
+    this.#config.autoResize = autoResize;
+  }
+
+  get onStep() {
+    return this.#config.onStep;
+  }
+
+  set onStep(handler) {
+    if (handler && !isFunction(handler)) return console.error(ERROR_INVALID_ONSTEP_CALLBACK);
+
+    this.#config.onStep = handler || DEFAULT_ENGINE_OPTIONS.onStep;
+  }
+
+  get isRunning() {
+    return this.#config.isRunning;
   }
 
   start() {
-    const start = performance.now();
+    const now = performance.now();
 
-    this.runData = {
-      start,
-      lastCall: start,
-      running: true,
-    };
+    this.#config.isRunning = true;
+    this.#config.initialTime = now;
+    this.#config.lastCallTime = now;
 
-    this.step(start);
+    this.#step(now);
   }
 
   stop() {
-    if (this.runData) this.runData.running = false;
+    this.#config.isRunning = false;
   }
 
-  setCanvasSize({ width, height } = {}) {
-    this.canvasSize = {
-      width: isNumber(width) ? width : this.target.clientWidth,
-      height: isNumber(height) ? height : this.target.clientHeight,
+  #step = now => {
+    if (!this.isRunning) return;
+
+    const stepParams = {
+      now,
+      offset: now - this.#config.lastCallTime,
+      width: this.target.width,
+      height: this.target.height,
     };
 
-    this.target.width = this.canvasSize.width;
-    this.target.height = this.canvasSize.height;
-  }
-
-  step(now) {
-    if (!this.runData.running) return;
-
-    const offset = now - this.runData.lastCall;
-
-    if (this.onTick) this.onTick({ offset, now, canvasSize: this.canvasSize });
+    this.layers.forEach(layer => layer.onStep && layer.onStep(stepParams, layer));
+    this.onStep && this.onStep(stepParams);
 
     this.draw();
-    this.runData.lastCall = now;
-    requestAnimationFrame(timestamp => this.step(timestamp));
-  }
+    this.#config.lastCallTime = now;
+    requestAnimationFrame(this.#step);
+  };
 
   draw() {
-    this.context.clearRect(0, 0, this.canvasSize.width, this.canvasSize.height);
+    if (!this.target || !this.layers) return null;
+
+    const { context } = this.#config;
+
+    context.clearRect(0, 0, this.target.width, this.target.height);
 
     this.layers.forEach(layer => {
       if (layer.isActive && layer.opacity) {
-        this.context.globalAlpha = layer.opacity;
-        this.context.drawImage(layer.source, layer.posX, layer.posY);
+        context.globalAlpha = layer.opacity;
+        context.drawImage(layer.source, layer.posX, layer.posY);
       }
     });
   }
