@@ -2,9 +2,10 @@
 
 Philately is a super easy to use rendering engine for HTML5 `<canvas>`. You have a renderer, some layers and that's all. Simple as that. Great for games, interactive media or just drawing some images to the canvas.
 
-```javascript
-import { Engine, Layer } from 'philately';
+```js
+import { Layer, Engine } from 'philately';
 
+// Layers area resolved as promises. So, don't worry about images not being ready.
 const myLayer = new Layer({ imageSrc: './myAwesomeImage.png' });
 
 const myEngine = new Engine({
@@ -15,262 +16,144 @@ const myEngine = new Engine({
 // Boom! You've got it working!
 ```
 
-⚠️ **The library has just been refactored into ES6, adding some new features. So, these docs might not be accurate. The documentation update is already on the way.** ⚠️
-
-## Structure
+## Getting started
 
 Philately is made out of two modules: **Layer** and **Engine**. They work together to create a sensible approach to working with canvas.
 
-**Layer** takes an image URL (or base64) or an element (like `<img>` or `<canvas>`) as source to be drawn by the engine. It also gives you some display controls, like opacity and position.
+**Layer** takes an image URL (or base64) or an element (`<img>` or `<canvas>`) as the source to be drawn. It also gives you some display controls, like opacity and position.
 
-**Engine** handles a layer stack, and renders it to a target `<canvas>`. It render the layers in a loop, while offering a pre-rendering hook.
-
-## Getting started
+**Engine** renders an array of `Layer` instances to a target `<canvas>`. It can also render continuously, offering a pre-render hook.
 
 A basic Philately setup is as simple as:
 
-```javascript
+```js
 import { Engine, Layer } from 'philately';
-
-// Layers load asyncronously. So, don't worry about images not being ready.
-const myImage = new Layer({ imageSrc: './myAwesomeImage.png', x: 100, y: 100, opacity: 0.5 });
-const myCanvas = new Layer({ source: '.onscreen-canvas', isActive: false });
 
 const myEngine = new Engine({
   target: '#target',
-  layers: [myImage, myCanvas],
-});
-```
-
-The image will be rendered as soon as it loads and the second layer will be skipped.
-
-Don't worry about waiting for images to load. The engine will wait for all layers to resolve before the first render.
-
-```javascript
-import { Engine, Layer } from 'philately';
-
-const myEngine = new Engine({
-  target: '#my-target',
   layers: [
-    new Layer({ imageSrc: 'path/to/image_01.png' }),
-    new Layer({ imageSrc: 'path/to/image_02.png' }),
-    new Layer({ imageSrc: 'path/to/image_03.png' }),
+    new Layer({ imageSrc: 'path/to/image_01.png', opacity: 0.5 }),
+    new Layer({ source: document.querySelector('#onscreen-image'), posX: 100 }),
+    new Layer({ source: '.onscreen-canvas', isActive: false }),
   ],
 });
 ```
 
-We could create an offscreen canvas:
+Don't worry about preloading images. The engine will wait for all layers' promises to resolve before the first render.
+The third layer is deactivated and will be skipped.
 
-```javascript
-// Creates a <canvas> element
-var canvas = document.createElement('canvas');
-var ctx = canvas.getContext('2d');
+---
 
-// Sets the canvas size
-var r = 50;
-canvas.width = r * 2;
-canvas.height = r * 2;
+You could also create an offscreen canvas and add it to the engine:
 
-// Draws a circle to the canvas
-ctx.arc(r, r, r, 0, 2 * Math.PI);
+```js
+import { Engine, Layer } from 'philately';
+
+// Creates an empty engine right away
+const myEngine = new Engine({ target: '#target' });
+
+// Creates a <canvas> element and draws a circle on it
+const myCanvas = document.createElement('canvas');
+const ctx = myCanvas.getContext('2d');
+const radius = 50;
+
+myCanvas.width = radius * 2;
+myCanvas.height = radius * 2;
+ctx.arc(radius, radius, radius, 0, 2 * Math.PI);
 ctx.fill();
-```
 
-And then add it to our engine:
-
-```javascript
-// Creates the new layer
-var canvasLayer = new Layer({
-  source: canvas,
-  x: 300,
-  y: 200,
-  opacity: 0.5,
+// Creates an animated layer from the canvas
+const myLayer = new Layer({
+  source: myCanvas,
+  onStep: () => {
+    myLayer.posX += 0.5;
+  },
 });
 
 // Adds it to the engine
-myEngine.addLayer(canvasLayer);
+myEngine.addLayer(myLayer);
 ```
 
-## Layer methods
-
-### Constructor
-
-Layer( options )
-
-**Parameters:** _options_ [*object*] A literal object which accepts the following options:
-
-- **source**: [*string* or *object*] A selector indicating an image or canvas element in the current document; or an element object, being either an instance of `HTMLImageElement` or `HTMLCanvasElement`.
-- **label**: [*string*] A textual label for the layer. Used mainly for searching for a layer and removing it.
-- **opacity**: [*number*] A decimal number from 0 to 1 representing the layer opacity.
-- **active**: [*boolean*] A boolean used to turn layer rendering on (`true`) or off (`false`).
-- **x**: [*number*] The horizontal position of the layer, relative to the canvas size.
-- **y**: [*number*] The vertical position of the layer, relative to the canvas size.
-
----
-
-### .source( [element] )
-
-Gets or sets the source element of the layer. If the "element" parameter is provided, updates the source.
-
-**Parameters**: _element_ [*string* or *object*] A selector indicating an image or canvas element in the current document; or an element object, being either an instance of `HTMLImageElement` or `HTMLCanvasElement`.
-
-**Return value:** the source DOM element object of the layer. If an invalid "element" parameter is provided, returns `false`.
-
----
-
-### .label( [label] )
-
-Gets or sets a label for the layer. If an string is provided as the "label" parameter, updates the label.
-
-**Parameters**: _label_ [*string*] A textual label for the layer. Used mainly for searching for a layer and removing it.
-
-**Return value:** the layer's label string. If an invalid parameter is provided, returns `false`.
-
----
-
-### .opacity( [opacity] )
-
-Gets or sets the opacity of the layer. If the "opacity" parameter is provided, updates the opacity.
-
-**Parameters**: _opacity_ [*number*] A decimal number from 0 to 1 representing the layer opacity.
-
-**Return value:** a decimal number from 0 to 1. If an invalid parameter is provided, returns `false`.
-
----
-
-### .active( [active] )
-
-Gets or sets the rendering state of the layer. If the "active" parameter is provided, updates the control.
-
-**Parameters**: _active_ [*boolean*] A boolean used to turn layer rendering on (`true`) or off (`false`).
-
-**Return value:** a boolean representing rendering control of the layer.
-
----
-
-### .position( [x, y] )
-
-Gets or sets the position of the layer. If **both "x" and "y"** parameters are provided, updates the position.
-
-**Parameters**: _x_ and _y_ [*number*] Numbers representing the the horizontal (x) and vertical (y) coordinates of the layer, relative to the canvas displayed size.
-_More about that in the `Engine.setCanvasSize()` section below._
-
-**Return value:** a literal object containing the x and y coordinates of the layer.
-
-## Engine methods
-
-### Constructor
-
-    Engine( options )
-
-**Parameters:** _options_ [*object*] A literal object which accepts the following options:
-
-- **target**: [*string* or *object*] The canvas element to display the engine on, being: a selector indicating a canvas element in the current document; or an element object that is an instance of `HTMLCanvasElement`.
-- **stepStart**: [*function*] A function to be run at every cycle of the rendering loop **before** the layers are drawn. Receives three parameters:
-  - `offset`: the amount of milliseconds since last cycle;
-  - `now`: the amount of milliseconds since the page started;
-  - `canvasSize`: an object with the width and height of the target canvas.
-- **stepEnd**: [*function*] A function to be run at every cycle of the rendering loop **after** the layers are drawn. Receives the same three parameters as the `stepStart` option.
-- **layers**: [*array*] An array of `Layer` instances to render on the target canvas.
-- **autoStart**: [*boolean*] Specifyes if the rendering loop should start as soon as the engine is created. The default value is `true`. If set to `false`, the rendering can be manually called using the `.draw()` method.
-
----
-
-### .target( canvas )
-
-Gets or sets the target `<canvas>` element of the engine. If the "canvas" parameter is provided, updates the target.
-
-**Parameters**: _canvas_ [*string* or *object*] A selector indicating a canvas element in the current document; or an element object, being an instance of `HTMLCanvasElement`.
-
-**Return value:** the target DOM element object where the engine is rendered. If an invalid "element" parameter is provided, returns `false`.
-
----
-
-### .setCanvasSize(width,height)
-
-Sets the displayed size of the target `<canvas>` element. This can be used to render stretched graphics, which may enhance the application performance. If no parameter is provided, sets the width and height to the actual size of the canvas. [Check it out in MDN](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas#Sizing_the_canvas).
-
-**Parameters**: _width_ and _height_ [*number*] Positive numbers representing the desired displayed size.
-
-**Return value:** _none_.
-
----
-
-### .resetLayers( layers )
-
-Removes all the layers from the layer stack. New layers may be provided as an array of `Layer` instances.
-
-**Parameters**: _layers_ [*array*] An array of `Layer` instances to be rendered on the target canvas.
-
-**Return value:** _none_.
-
----
-
-### .addLayer( layer )
-
-Adds a single `Layer` instance the top of the layer stack.
-
-**Parameters**: _layer_ [*object*] An instance of the `Layer` class.
-
-**Return value:** An integer indicating the new size of the layer stack. If an invalid _layer_ parameter is provided, returns `false`.
-
----
-
-### .removeLayer( layer )
-
-Removes one or more layers from the layer stack.
-
-If the "layer" parameter matches a layer that was added to the engine multiple times, all of its occurrences will be removed. Also, if the "label" option of multiple layers matches a string provided as the "layer" parameter, all of these layers will be removed.
-
-**Parameters**: _layer_ [*object* or *string*] An instance of the `Layer` class; or a non-empty string matching the "label" option of the layer(s) to be removed.
-
-**Return value:** An integer indicating the new size of the layer stack.
-
----
-
-### .draw()
-
-Manually draws the layer stack to the target `<canvas>`. Specially useful to update the graphics when the engine `autoStart` option was set to `false` or the `stop()` method has been called.
-
-**Parameters**: _none_
-
-**Return value:** _none_
-
----
-
-### .start()
-
-Starts the rendering loop.
-
-**Parameters**: _none_
-
-**Return value:** _none_
-
----
-
-### .stop()
-
-Stops the rendering loop.
-
-**Parameters**: _none_
-
-**Return value:** _none_
-
----
-
-## Common pitfalls
+# API
+
+## `Layer`
+
+### Constructor options
+
+```js
+new Layer({
+  posX: 0, // X position [number]
+  posY: 0, // Y position [number]
+  opacity: 1, // Opacity [number]
+  isActive: true, // Is layer enabled [boolean]
+  onStep: ({ now, offset, width, height }, layer) => {}, // Pre-render hook [function]
+
+  // It is required that one of the following are set. `imageSrc` takes precedence over `source`
+  imageSrc: 'image.jpg', // Path to image source [string]
+  source: '.canvas-or-image', // Layer source element [string, HTMLImageElement or HTMLCanvasElement]
+});
+```
+
+### Properties
+
+- `sourcePromise`: _[read only]_ Promise that resolves as soon as the source is ready
+- `source`: _[read only]_ Reference to the dom element of the source
+- `size`: _[read only]_ An object containing the `width` and `height` of the layer source
+- `posX`: The X position of the layer
+- `posY`: The Y position of the layer
+- `opacity`: A number from 0 to 1 representing the opacity of the layer
+- `isActive`: A boolean for enabling/disabling the layer
+- `onStep`: A function that is called before the each rendering cycle. The parameters passed are [`renderParams`](#renderParams)
+  (same as in `Engine`) and `layer` (a reference to the layer itself)
+
+### Methods
+
+- `toggle()`: Toggles the layer between enabled and disabled
+
+## `Engine`
+
+### Constructor options
+
+```js
+new Engine({
+  target: '.target-canvas', // `Engine` target element [string or HTMLCanvasElement]
+  layers: [], // An array of `Layer` instances [array]
+  autoStart: false, // Start engine's refresh cycle as soon as layers are ready [boolean]
+  autoResize: true, // Bind the target canvas' width and height to the element's display size [boolean]
+  onStep: ({ now, offset, width, height }) => {}, // Pre-render hook [function]
+});
+```
+
+### Properties
+
+- `target`: The target `<canvas>` element for the engine to be rendered on. It should be a selector string
+  or the HTMLCanvasElement dom reference
+- `layers`: An array of `Layer` instances to be rendered. The last item in the array is rendered on top
+- `autoResize`: A boolean indicating if the target [canvas' width and height](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas#Attributes) to the element's display size
+- `isRunning`: _[read only]_ A boolean indicating if the engine's refresh cycle is active
+- `onStep`: A function that is called before the each rendering cycle. A [`renderParams` object](#renderParams) is passed
+  to the function.
+
+#### `renderParams`
+
+An object that is passed to the `onStep` function. It contains the following properties:
+
+- `now`: A [high-resolution timestamp](https://developer.mozilla.org/en-US/docs/Web/API/Performance/now) since the beginning
+  of the application
+- `offset`: The difference (in milliseconds) since the last refresh cycle
+- `width`: The width of the target canvas
+- `height`: The height of the target canvas
+
+## Methods
+
+- `addLayer( layer )`:Adds a `Layer` instance the top of the layer stack.
+- `removeLayer( layer )`: Removes a layer from the stack. If the layer was added to the engine multiple times, only the first
+  occurrence is removed.
+- `draw()`: Draws the layer stack to the target `<canvas>`. Specially useful to update the graphics when the engine `autoStart`
+  option was set to `false` or the `stop()` method has been called.
+- `start()`: Starts the rendering loop.
+- `stop()`: Stops the rendering loop.
+
+# Caveats
 
 - The `<canvas>` element may easily become "tainted" by CORS. That should not be a problem for basic layer rendering, but can be a challenge if you need to do some advanced image processing. To avoid that, you could use some of the solutions [shown in MDN](https://developer.mozilla.org/en-US/docs/Web/HTML/CORS_enabled_image) or use base64 encoded images.
-- If you need support for older browsers, you may need polyfills for some of the javascript features used by Philately, like `requestanimationframe` and `performance.now()`. Check out these gists by [Paul Irish](http://twitter.com/paul_irish):
-- [requestAnimationFrame polyfill](https://gist.github.com/paulirish/1579671)
-- [performance.now() polyfill](https://gist.github.com/paulirish/5438650)
-
----
-
-## Plans for future releases
-
-In future releases, we plan to add some new features, like:
-
-- Updated docs
-- 2D transforms for layers (scaling and rotation)
-- Add `onTick` support for layers
