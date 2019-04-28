@@ -50,7 +50,10 @@ You could also create an offscreen canvas and add it to the engine:
 import { Engine, Layer } from 'philately';
 
 // Creates an empty engine right away
-const myEngine = new Engine({ target: '#target' });
+const myEngine = new Engine({
+  target: '#my-target',
+  autoStart: true,
+});
 
 // Creates a <canvas> element and draws a circle on it
 const myCanvas = document.createElement('canvas');
@@ -65,9 +68,7 @@ ctx.fill();
 // Creates an animated layer from the canvas
 const myLayer = new Layer({
   source: myCanvas,
-  onStep: () => {
-    myLayer.posX += 0.5;
-  },
+  onStep: () => myLayer.posX++,
 });
 
 // Adds it to the engine
@@ -141,19 +142,23 @@ An object that is passed to the `onStep` function. It contains the following pro
 - `now`: A [high-resolution timestamp](https://developer.mozilla.org/en-US/docs/Web/API/Performance/now) since the beginning
   of the application
 - `offset`: The difference (in milliseconds) since the last refresh cycle
-- `width`: The width of the target canvas
-- `height`: The height of the target canvas
+- `width`: The width of the target canvas. Only available if the target `<canvas>` is set.
+- `height`: The height of the target canvas. Only available if the target `<canvas>` is set.
 
 ## Methods
 
-- `addLayer( layer )`:Adds a `Layer` instance the top of the layer stack.
-- `removeLayer( layer )`: Removes a layer from the stack. If the layer was added to the engine multiple times, only the first
-  occurrence is removed.
+- `addLayer( layer, shouldDraw = true )`: Adds a `Layer` instance the top of the layer stack. By default, draws to the target
+  once the layer is ready.
+- `removeLayer( layer, shouldDraw = true )`: Removes a layer from the stack. If the layer was added to the engine multiple
+  times, only the first occurrence is removed. By default, updates the target canvas after removing the layer.
 - `draw()`: Draws the layer stack to the target `<canvas>`. Specially useful to update the graphics when the engine `autoStart`
   option was set to `false` or the `stop()` method has been called.
+- `clear()`: Clears the target `<canvas>`.
 - `start()`: Starts the rendering loop.
 - `stop()`: Stops the rendering loop.
 
 # Caveats
 
+- Since adding layers to an engine happens in an async mode, race conditions might happen. To handle any issues, you can use
+  the promise exposed in `myLayer.sourcePromise` and/or avoid drawing to the canvas by passing the `shouldDraw` parameter as false to `addLayer`. Eg.: `myEngine.addLayer(myLayer, false)`.
 - The `<canvas>` element may easily become "tainted" by CORS. That should not be a problem for basic layer rendering, but can be a challenge if you need to do some advanced image processing. To avoid that, you could use some of the solutions [shown in MDN](https://developer.mozilla.org/en-US/docs/Web/HTML/CORS_enabled_image) or use base64 encoded images.

@@ -33,12 +33,11 @@ class Engine {
     this.onStep = onStep;
     this.target = target;
 
-    if (this.target && this.layers.length)
-      Promise.all(this.layers.map(layer => layer.sourcePromise)).then(() => {
-        if (autoStart) return this.start();
+    this.#config.layersPromise.then(() => {
+      if (autoStart) return this.start();
 
-        this.draw();
-      });
+      this.draw();
+    });
   }
 
   get target() {
@@ -66,20 +65,28 @@ class Engine {
     if (!isArray(newLayers)) return console.error(ERROR_INVALID_LAYER_ARRAY);
 
     this.#config.layers = [];
-    newLayers.forEach(layer => this.addLayer(layer));
+    newLayers.forEach(layer => this.addLayer(layer, false));
+
+    this.#config.layersPromise = Promise.all(this.layers.map(({ sourcePromise }) => sourcePromise));
+
+    if (this.target && !this.isRunning) this.#config.layersPromise.then(this.draw);
   }
 
-  addLayer(layer) {
+  addLayer(layer, shouldDraw = true) {
     if (!layer instanceof Layer) return console.warn(ERROR_INVALID_LAYER);
 
     this.#config.layers = [...this.#config.layers, layer];
+
+    if (shouldDraw) layer.sourcePromise.then(this.draw);
   }
 
-  removeLayer(layer) {
+  removeLayer(layer, shouldDraw = true) {
     const index = this.layers.indexOf(layer);
     if (index < 0) return console.warn(ERROR_LAYER_NOT_FOUND);
 
     this.#config.layers = [...this.layers.slice(0, index), ...this.layers.slice(index + 1)];
+
+    if (shouldDraw) this.draw();
   }
 
   #resetTargetSize = () => {
@@ -138,8 +145,10 @@ class Engine {
     const stepParams = {
       now,
       offset: now - this.#config.lastCallTime,
-      width: this.target.width,
-      height: this.target.height,
+      ...(this.target && {
+        width: this.target.width,
+        height: this.target.height,
+      }),
     };
 
     this.layers.forEach(layer => layer.onStep && layer.onStep(stepParams, layer));
@@ -150,20 +159,24 @@ class Engine {
     requestAnimationFrame(this.#step);
   };
 
-  draw() {
-    if (!this.target || !this.layers) return null;
+  clear = () =>
+    this.#config.context &&
+    this.#config.context.clearRect(0, 0, this.target.width, this.target.height);
 
+  draw = () => {
     const { context } = this.#config;
 
-    context.clearRect(0, 0, this.target.width, this.target.height);
+    if (!context) return null;
+
+    this.clear();
 
     this.layers.forEach(layer => {
       if (layer.isActive && layer.opacity) {
-        context.globalAlpha = layer.opacity;
-        context.drawImage(layer.source, layer.posX, layer.posY);
+        this.#config.context.globalAlpha = layer.opacity;
+        this.#config.context.drawImage(layer.source, layer.posX, layer.posY);
       }
     });
-  }
+  };
 }
 
 export default Engine;
