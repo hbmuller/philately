@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "lib": ["es2015", "dom", "es2015.iterable"],
+    "module": "commonjs",
+    "declaration": true,
+    "sourceMap": true,
+    "outDir": "dist",
+    "strict": true,
+    "noImplicitAny": true,
+    // "strictNullChecks": true,              /* Enable strict null checks. */
+    "noUnusedLocals": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "types": ["lodash"],
+    "downlevelIteration": true
+  },
+  "exclude": ["node_modules"],
+  "include": ["src/**/*"]
+}
