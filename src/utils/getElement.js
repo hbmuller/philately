@@ -16,7 +16,8 @@ export const getAsyncElement = (...params) => {
   const element = resolveValidElement(...params);
 
   if (element instanceof HTMLImageElement) return imageLoader(element);
-  if (element instanceof HTMLCanvasElement) return Promise.resolve(getElementInfo(element));
+  else if (element instanceof HTMLCanvasElement) return Promise.resolve(getElementInfo(element));
+  else if (element instanceof SVGElement) return createSource(`data:image/svg+xml;utf8,${element.outerHTML}`);
 
   return Promise.reject();
 };
