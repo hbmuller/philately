@@ -104,7 +104,7 @@ new Layer({
 - `posY`: The Y position of the layer
 - `opacity`: A number from 0 to 1 representing the opacity of the layer
 - `isActive`: A boolean for enabling/disabling the layer
-- `onStep`: A function that is called before the each rendering cycle. The parameters passed are [`renderParams`](#renderParams)
+- `onStep`: A function that is called before each rendering cycle. The parameters passed are [`renderParams`](#renderParams)
   (same as in `Engine`) and `layer` (a reference to the layer itself)
 
 ### Methods
@@ -132,7 +132,7 @@ new Engine({
 - `layers`: An array of `Layer` instances to be rendered. The last item in the array is rendered on top
 - `autoResize`: A boolean indicating if the target [canvas' width and height](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas#Attributes) to the element's display size
 - `isRunning`: _[read only]_ A boolean indicating if the engine's refresh cycle is active
-- `onStep`: A function that is called before the each rendering cycle. A [`renderParams` object](#renderParams) is passed
+- `onStep`: A function that is called before each rendering cycle. A [`renderParams` object](#renderParams) is passed
   to the function.
 
 #### `renderParams`
@@ -151,7 +151,7 @@ An object that is passed to the `onStep` function. It contains the following pro
   once the layer is ready.
 - `removeLayer( layer, shouldDraw = true )`: Removes a layer from the stack. If the layer was added to the engine multiple
   times, only the first occurrence is removed. By default, updates the target canvas after removing the layer.
-- `draw()`: Draws the layer stack to the target `<canvas>`. Specially useful to update the graphics when the engine `autoStart`
+- `draw()`: Draws the layer stack to the target `<canvas>`. Especially useful to update the graphics when the engine `autoStart`
   option was set to `false` or the `stop()` method has been called.
 - `clear()`: Clears the target `<canvas>`.
 - `start()`: Starts the rendering loop.
