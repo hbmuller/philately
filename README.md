@@ -1,6 +1,6 @@
 # Philately
 
-Philately is a super easy to use rendering engine for HTML5 `<canvas>`. You have a renderer, some layers and that's all. Simple as that. Great for games, interactive media or just drawing some images to the canvas.
+Philately is super easy to use rendering engine for HTML5 `<canvas>`. You have a renderer, some layers and that's all. Simple as that. Great for games, interactive media or just drawing some images to the canvas.
 
 ```js
 import { Layer, Engine } from 'philately';
@@ -66,7 +66,7 @@ ctx.arc(radius, radius, radius, 0, 2 * Math.PI);
 ctx.fill();
 
 // Creates an animated layer from the canvas
-const myLayer = new Layer({
+const my layer = new Layer({
   source: myCanvas,
   onStep: () => myLayer.posX++,
 });
@@ -97,14 +97,14 @@ new Layer({
 
 ### Properties
 
-- `sourcePromise`: _[read only]_ Promise that resolves as soon as the source is ready
+- `source promise`: _[read only]_ Promise that resolves as soon as the source is ready
 - `source`: _[read only]_ Reference to the dom element of the source
 - `size`: _[read only]_ An object containing the `width` and `height` of the layer source
 - `posX`: The X position of the layer
 - `posY`: The Y position of the layer
 - `opacity`: A number from 0 to 1 representing the opacity of the layer
 - `isActive`: A boolean for enabling/disabling the layer
-- `onStep`: A function that is called before the each rendering cycle. The parameters passed are [`renderParams`](#renderParams)
+- `onStep`: A function that is called before each rendering cycle. The parameters passed are [`renderParams`](#renderParams)
   (same as in `Engine`) and `layer` (a reference to the layer itself)
 
 ### Methods
@@ -130,9 +130,9 @@ new Engine({
 - `target`: The target `<canvas>` element for the engine to be rendered on. It should be a selector string
   or the HTMLCanvasElement dom reference
 - `layers`: An array of `Layer` instances to be rendered. The last item in the array is rendered on top
-- `autoResize`: A boolean indicating if the target [canvas' width and height](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas#Attributes) to the element's display size
+- `auto-resize`: A boolean indicating if the target [canvas' width and height](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas#Attributes) to the element's display size
 - `isRunning`: _[read only]_ A boolean indicating if the engine's refresh cycle is active
-- `onStep`: A function that is called before the each rendering cycle. A [`renderParams` object](#renderParams) is passed
+- `onStep`: A function that is called before each rendering cycle. A [`renderParams` object](#renderParams) is passed
   to the function.
 
 #### `renderParams`
@@ -149,9 +149,9 @@ An object that is passed to the `onStep` function. It contains the following pro
 
 - `addLayer( layer, shouldDraw = true )`: Adds a `Layer` instance the top of the layer stack. By default, draws to the target
   once the layer is ready.
-- `removeLayer( layer, shouldDraw = true )`: Removes a layer from the stack. If the layer was added to the engine multiple
+- `removeLayer( layer, should draw = true )`: Removes a layer from the stack. If the layer was added to the engine multiple
   times, only the first occurrence is removed. By default, updates the target canvas after removing the layer.
-- `draw()`: Draws the layer stack to the target `<canvas>`. Specially useful to update the graphics when the engine `autoStart`
+- `draw()`: Draws the layer stack to the target `<canvas>`. Especially useful to update the graphics when the engine `autoStart`
   option was set to `false` or the `stop()` method has been called.
 - `clear()`: Clears the target `<canvas>`.
 - `start()`: Starts the rendering loop.
