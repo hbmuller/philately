@@ -4,3 +4,6 @@ npm-debug.log
 lib
 dist
 yarn-error.log
+
+# Ignore macOS Desktop services files.
+.DS_Store
