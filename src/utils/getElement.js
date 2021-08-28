@@ -2,7 +2,7 @@ import isString from 'lodash/isString';
 import { imageLoader, getElementInfo } from '.';
 
 const isValidElement = (element, validTypes) =>
-  element && validTypes.some(type => element instanceof type);
+  element && validTypes.some((type) => element instanceof type);
 
 const resolveValidElement = (selector, validTypes) => {
   const element = isString(selector) ? document.querySelector(selector) : selector;

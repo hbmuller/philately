@@ -65,7 +65,7 @@ class Engine {
     if (!isArray(newLayers)) return console.error(ERROR_INVALID_LAYER_ARRAY);
 
     this.#config.layers = [];
-    newLayers.forEach(layer => this.addLayer(layer, false));
+    newLayers.forEach((layer) => this.addLayer(layer, false));
 
     this.#config.layersPromise = Promise.all(this.layers.map(({ sourcePromise }) => sourcePromise));
 
@@ -139,7 +139,7 @@ class Engine {
     this.#config.isRunning = false;
   }
 
-  #step = now => {
+  #step = (now) => {
     if (!this.isRunning) return;
 
     const stepParams = {
@@ -151,7 +151,7 @@ class Engine {
       }),
     };
 
-    this.layers.forEach(layer => layer.onStep && layer.onStep(stepParams, layer));
+    this.layers.forEach((layer) => layer.onStep && layer.onStep(stepParams, layer));
     this.onStep && this.onStep(stepParams);
 
     this.draw();
@@ -170,7 +170,7 @@ class Engine {
 
     this.clear();
 
-    this.layers.forEach(layer => {
+    this.layers.forEach((layer) => {
       if (layer.isActive && layer.opacity) {
         this.#config.context.globalAlpha = layer.opacity;
         this.#config.context.drawImage(layer.source, layer.posX, layer.posY);

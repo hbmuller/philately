@@ -1,6 +1,6 @@
 import { getElementInfo } from '.';
 
-export const imageLoader = element =>
+export const imageLoader = (element) =>
   new Promise((resolve, reject) => {
     const handleComplete = () => resolve(getElementInfo(element));
 
@@ -10,7 +10,7 @@ export const imageLoader = element =>
     element.addEventListener('error', reject);
   });
 
-export const createSource = src => {
+export const createSource = (src) => {
   const element = document.createElement('img');
   element.src = src;
 
