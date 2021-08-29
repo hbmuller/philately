@@ -5,7 +5,7 @@ import {
   ERROR_INVALID_TARGET,
   VALID_TARGET_TYPES,
 } from './constants';
-import { ElementInfo, StepParams } from './types';
+import type { ElementInfo, StepParams } from './types';
 
 import { Layer } from './Layer';
 import { getElement } from './utils';

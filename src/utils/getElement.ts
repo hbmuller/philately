@@ -1,4 +1,4 @@
-import { ElementType, ValidElementTypes } from '../types';
+import type { ElementType, ValidElementTypes } from '../types';
 import { getElementInfo, imageLoader } from '.';
 
 const isValidElement = (element: Element, validTypes: ValidElementTypes) =>
