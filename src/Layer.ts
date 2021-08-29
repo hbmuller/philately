@@ -1,21 +1,40 @@
-import isNumber from 'lodash/isNumber';
-import isFunction from 'lodash/isFunction';
-import {
-  DEFAULT_LAYER_OPTIONS,
-  VALID_SOURCE_TYPES,
-  ERROR_INVALID_SOURCE,
-  ERROR_INVALID_ONSTEP_CALLBACK,
-} from './constants';
+import { ERROR_INVALID_SOURCE, VALID_SOURCE_TYPES } from './constants';
+import type { ElementType, SourceDimensions, SourcePromise, StepHandler } from './types';
 import { createSource, getAsyncElement } from './utils';
 
-class Layer {
-  #config = {
+export type LayerOptions = {
+  source?: string | ElementType;
+  imageSrc?: string;
+  posX?: number;
+  posY?: number;
+  opacity?: number;
+  isActive?: boolean;
+  onStep?: StepHandler;
+};
+
+export const DEFAULT_LAYER_OPTIONS: LayerOptions = {
+  isActive: true,
+  opacity: 1,
+  posX: 0,
+  posY: 0,
+  onStep: null,
+};
+
+type LayerConfig = Omit<LayerOptions, 'isActive'> & {
+  isActive: boolean;
+  isReady: boolean;
+  sourcePromise?: SourcePromise;
+  size?: SourceDimensions;
+};
+
+export class Layer {
+  #config: LayerConfig = {
     ...DEFAULT_LAYER_OPTIONS,
     isActive: false,
     isReady: false,
   };
 
-  constructor(options) {
+  constructor(options: LayerOptions) {
     const { posX, posY, opacity, onStep, isActive, imageSrc, source } = {
       ...DEFAULT_LAYER_OPTIONS,
       ...options,
@@ -33,8 +52,10 @@ class Layer {
     }
   }
 
-  #setSource = (sourcePromise, isActive) => {
-    this.#config.sourcePromise = sourcePromise
+  #setSource = (sourcePromise: SourcePromise, isActive?: boolean) => {
+    this.#config.sourcePromise = sourcePromise;
+
+    sourcePromise
       .then(({ element, ...size }) => {
         this.#config.source = element;
         this.#config.size = size;
@@ -63,7 +84,7 @@ class Layer {
   }
 
   set posX(value) {
-    if (isNumber(value)) this.#config.posX = value;
+    if (typeof value === 'number') this.#config.posX = value;
   }
 
   get posY() {
@@ -71,7 +92,7 @@ class Layer {
   }
 
   set posY(value) {
-    if (isNumber(value)) this.#config.posY = value;
+    if (typeof value === 'number') this.#config.posY = value;
   }
 
   get opacity() {
@@ -79,7 +100,7 @@ class Layer {
   }
 
   set opacity(opacity) {
-    if (isNumber(opacity)) this.#config.opacity = Math.max(0, Math.min(1, opacity));
+    if (typeof opacity === 'number') this.#config.opacity = Math.max(0, Math.min(1, opacity));
   }
 
   get onStep() {
@@ -87,9 +108,7 @@ class Layer {
   }
 
   set onStep(handler) {
-    if (handler && !isFunction(handler)) return console.error(ERROR_INVALID_ONSTEP_CALLBACK);
-
-    this.#config.onStep = handler || DEFAULT_LAYER_OPTIONS.onStep;
+    this.#config.onStep = handler;
   }
 
   get isActive() {
@@ -106,5 +125,3 @@ class Layer {
     return this.isActive;
   }
 }
-
-export default Layer;

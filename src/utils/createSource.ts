@@ -1,6 +1,7 @@
-import { getElementInfo } from '.';
+import type { SourcePromise } from '../types';
+import { getElementInfo } from './getElementInfo';
 
-export const imageLoader = (element) =>
+export const imageLoader = (element: HTMLImageElement): SourcePromise =>
   new Promise((resolve, reject) => {
     const handleComplete = () => resolve(getElementInfo(element));
 
@@ -10,7 +11,7 @@ export const imageLoader = (element) =>
     element.addEventListener('error', reject);
   });
 
-export const createSource = (src) => {
+export const createSource = (src: string) => {
   const element = document.createElement('img');
   element.src = src;
 

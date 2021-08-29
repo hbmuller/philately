@@ -1,17 +1,32 @@
-import isArray from 'lodash/isArray';
-import isFunction from 'lodash/isFunction';
 import {
-  DEFAULT_ENGINE_OPTIONS,
-  ERROR_INVALID_TARGET,
   ERROR_INVALID_LAYER,
-  ERROR_LAYER_NOT_FOUND,
-  ERROR_INVALID_ONSTEP_CALLBACK,
   ERROR_INVALID_LAYER_ARRAY,
+  ERROR_INVALID_ONSTEP_CALLBACK,
+  ERROR_INVALID_TARGET,
+  ERROR_LAYER_NOT_FOUND,
   VALID_TARGET_TYPES,
 } from './constants';
 
+import { Layer } from './Layer';
+import { StepHandler } from './types';
 import { getElement } from './utils';
-import Layer from './Layer';
+import isArray from 'lodash/isArray';
+import isFunction from 'lodash/isFunction';
+
+export type EngineOptions = {
+  target?: HTMLCanvasElement;
+  layers?: Layer[];
+  onStep?: StepHandler;
+  autoStart?: boolean;
+  autoResize?: boolean;
+};
+
+export const DEFAULT_ENGINE_OPTIONS: EngineOptions = {
+  layers: [],
+  onStep: null,
+  autoStart: false,
+  autoResize: true,
+};
 
 class Engine {
   #config = {
@@ -22,7 +37,7 @@ class Engine {
     lastCallTime: null,
   };
 
-  constructor(options) {
+  constructor(options: EngineOptions) {
     const { target, layers, onStep, autoStart, autoResize } = {
       ...DEFAULT_ENGINE_OPTIONS,
       ...options,

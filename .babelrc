@@ -1,4 +1,8 @@
 {
   "presets": ["@babel/env"],
-  "plugins": ["@babel/plugin-proposal-class-properties", "@babel/plugin-proposal-private-methods"]
+  "plugins": [
+    "@babel/preset-typescript",
+    "@babel/plugin-proposal-class-properties",
+    "@babel/plugin-proposal-private-methods"
+  ]
 }

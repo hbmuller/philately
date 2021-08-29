@@ -1,6 +1,6 @@
 {
-  "parser": "babel-eslint",
-  "plugins": ["prettier"],
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["prettier", "@typescript-eslint"],
   "parserOptions": {
     "sourceType": "module",
     "allowImportExportEverywhere": false,
@@ -8,7 +8,7 @@
   },
   "rules": {
     "prettier/prettier": "error",
-    "no-unused-vars": 2,
-    "max-len": 0
-  }
+    "@typescript-eslint/explicit-module-boundary-types": "off"
+  },
+  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"]
 }
