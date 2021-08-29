@@ -5,8 +5,6 @@ export type StepParams = {
   height?: number;
 };
 
-export type StepHandler = (arg: StepParams) => void;
-
 export type SourceDimensions = {
   width: number;
   height: number;

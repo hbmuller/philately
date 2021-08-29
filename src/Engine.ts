@@ -3,20 +3,17 @@ import {
   ERROR_INVALID_LAYER_ARRAY,
   ERROR_INVALID_ONSTEP_CALLBACK,
   ERROR_INVALID_TARGET,
-  ERROR_LAYER_NOT_FOUND,
   VALID_TARGET_TYPES,
 } from './constants';
+import { ElementInfo, StepParams } from './types';
 
 import { Layer } from './Layer';
-import { StepHandler } from './types';
 import { getElement } from './utils';
-import isArray from 'lodash/isArray';
-import isFunction from 'lodash/isFunction';
 
 export type EngineOptions = {
-  target?: HTMLCanvasElement;
+  target?: string | HTMLCanvasElement;
   layers?: Layer[];
-  onStep?: StepHandler;
+  onStep?: (params: StepParams) => void;
   autoStart?: boolean;
   autoResize?: boolean;
 };
@@ -28,8 +25,17 @@ export const DEFAULT_ENGINE_OPTIONS: EngineOptions = {
   autoResize: true,
 };
 
-class Engine {
-  #config = {
+type EngineState = Omit<EngineOptions, 'autoStart' | 'target'> & {
+  target?: HTMLCanvasElement;
+  context?: CanvasRenderingContext2D;
+  isRunning: boolean;
+  initialTime?: number;
+  lastCallTime?: number;
+  layersPromise?: Promise<ElementInfo[]>;
+};
+
+export class Engine {
+  #state: EngineState = {
     target: null,
     context: null,
     isRunning: false,
@@ -48,58 +54,57 @@ class Engine {
     this.onStep = onStep;
     this.target = target;
 
-    this.#config.layersPromise.then(() => {
+    this.#state.layersPromise.then(() => {
       if (autoStart) return this.start();
 
       this.draw();
     });
   }
 
-  get target() {
-    return this.#config.target;
+  get target(): HTMLCanvasElement {
+    return this.#state.target;
   }
 
-  set target(selector) {
+  set target(selector: string | HTMLCanvasElement) {
     if (!selector) return;
 
     const { element } = getElement(selector, VALID_TARGET_TYPES);
 
-    if (!element) return console.error(ERROR_INVALID_TARGET);
+    if (!element) throw new Error(ERROR_INVALID_TARGET);
 
-    this.#config.target = element;
-    this.#config.context = element.getContext('2d');
+    this.#state.target = element as HTMLCanvasElement;
+    this.#state.context = this.#state.target.getContext('2d');
 
     if (this.autoResize) this.#resetTargetSize();
   }
 
   get layers() {
-    return [...this.#config.layers];
+    return [...this.#state.layers];
   }
 
   set layers(newLayers) {
-    if (!isArray(newLayers)) return console.error(ERROR_INVALID_LAYER_ARRAY);
+    if (!Array.isArray(newLayers)) throw new Error(ERROR_INVALID_LAYER_ARRAY);
 
-    this.#config.layers = [];
+    this.#state.layers = [];
     newLayers.forEach((layer) => this.addLayer(layer, false));
 
-    this.#config.layersPromise = Promise.all(this.layers.map(({ sourcePromise }) => sourcePromise));
+    this.#state.layersPromise = Promise.all(this.layers.map(({ sourcePromise }) => sourcePromise));
 
-    if (this.target && !this.isRunning) this.#config.layersPromise.then(this.draw);
+    if (this.target && !this.isRunning) this.#state.layersPromise.then(this.draw);
   }
 
-  addLayer(layer, shouldDraw = true) {
-    if (!layer instanceof Layer) return console.warn(ERROR_INVALID_LAYER);
+  addLayer(layer: Layer, shouldDraw = true) {
+    if (layer instanceof Layer) {
+      this.#state.layers = [...this.layers, layer];
 
-    this.#config.layers = [...this.#config.layers, layer];
-
-    if (shouldDraw) layer.sourcePromise.then(this.draw);
+      if (shouldDraw) layer.sourcePromise.then(this.draw);
+    } else {
+      console.warn(ERROR_INVALID_LAYER);
+    }
   }
 
-  removeLayer(layer, shouldDraw = true) {
-    const index = this.layers.indexOf(layer);
-    if (index < 0) return console.warn(ERROR_LAYER_NOT_FOUND);
-
-    this.#config.layers = [...this.layers.slice(0, index), ...this.layers.slice(index + 1)];
+  removeLayer(layer: Layer, shouldDraw = true) {
+    this.#state.layers = this.layers.filter((item) => !Object.is(item, layer));
 
     if (shouldDraw) this.draw();
   }
@@ -114,7 +119,7 @@ class Engine {
   };
 
   get autoResize() {
-    return this.#config.autoResize;
+    return this.#state.autoResize;
   }
 
   set autoResize(value) {
@@ -123,43 +128,43 @@ class Engine {
     if (autoResize && !this.autoResize) window.addEventListener('resize', this.#resetTargetSize);
     if (!autoResize && this.autoResize) window.removeEventListener('resize', this.#resetTargetSize);
 
-    this.#config.autoResize = autoResize;
+    this.#state.autoResize = autoResize;
   }
 
   get onStep() {
-    return this.#config.onStep;
+    return this.#state.onStep;
   }
 
   set onStep(handler) {
-    if (handler && !isFunction(handler)) return console.error(ERROR_INVALID_ONSTEP_CALLBACK);
+    if (handler && typeof handler !== 'function') throw new Error(ERROR_INVALID_ONSTEP_CALLBACK);
 
-    this.#config.onStep = handler || DEFAULT_ENGINE_OPTIONS.onStep;
+    this.#state.onStep = handler;
   }
 
   get isRunning() {
-    return this.#config.isRunning;
+    return this.#state.isRunning;
   }
 
   start() {
     const now = performance.now();
 
-    this.#config.isRunning = true;
-    this.#config.initialTime = now;
-    this.#config.lastCallTime = now;
+    this.#state.isRunning = true;
+    this.#state.initialTime = now;
+    this.#state.lastCallTime = now;
 
     this.#step(now);
   }
 
   stop() {
-    this.#config.isRunning = false;
+    this.#state.isRunning = false;
   }
 
-  #step = (now) => {
+  #step = (now: number) => {
     if (!this.isRunning) return;
 
     const stepParams = {
       now,
-      offset: now - this.#config.lastCallTime,
+      offset: now - this.#state.lastCallTime,
       ...(this.target && {
         width: this.target.width,
         height: this.target.height,
@@ -170,16 +175,16 @@ class Engine {
     this.onStep && this.onStep(stepParams);
 
     this.draw();
-    this.#config.lastCallTime = now;
+    this.#state.lastCallTime = now;
     requestAnimationFrame(this.#step);
   };
 
   clear = () =>
-    this.#config.context &&
-    this.#config.context.clearRect(0, 0, this.target.width, this.target.height);
+    this.#state.context &&
+    this.#state.context.clearRect(0, 0, this.target.width, this.target.height);
 
-  draw = () => {
-    const { context } = this.#config;
+  draw = (): void => {
+    const { context } = this.#state;
 
     if (!context) return null;
 
@@ -187,11 +192,9 @@ class Engine {
 
     this.layers.forEach((layer) => {
       if (layer.isActive && layer.opacity) {
-        this.#config.context.globalAlpha = layer.opacity;
-        this.#config.context.drawImage(layer.source, layer.posX, layer.posY);
+        this.#state.context.globalAlpha = layer.opacity;
+        this.#state.context.drawImage(layer.source, layer.posX, layer.posY);
       }
     });
   };
 }
-
-export default Engine;

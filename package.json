@@ -2,7 +2,7 @@
   "name": "philately",
   "version": "0.3.2",
   "description": "A rendering engine for HTML5 canvas with layer support.",
-  "main": "lib/index.js",
+  "main": "dist/index.js",
   "author": "Henrique Müller <hbmuller@gmail.com>",
   "license": "MIT",
   "repository": {
@@ -18,14 +18,12 @@
     "renderer"
   ],
   "scripts": {
-    "build": "rimraf lib && babel src --out-dir lib",
+    "build": "rimraf lib && babel src --extensions '.ts' --out-dir dist && tsc",
     "lint": "eslint src"
   },
   "devDependencies": {
     "@babel/cli": "^7.14.8",
     "@babel/core": "^7.15.0",
-    "@babel/plugin-proposal-class-properties": "^7.14.5",
-    "@babel/plugin-proposal-private-methods": "^7.14.5",
     "@babel/preset-env": "^7.15.0",
     "@babel/preset-typescript": "^7.15.0",
     "@types/lodash": "^4.14.172",

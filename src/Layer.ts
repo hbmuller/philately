@@ -1,5 +1,5 @@
 import { ERROR_INVALID_SOURCE, VALID_SOURCE_TYPES } from './constants';
-import type { ElementType, SourceDimensions, SourcePromise, StepHandler } from './types';
+import type { ElementType, SourceDimensions, SourcePromise, StepParams } from './types';
 import { createSource, getAsyncElement } from './utils';
 
 export type LayerOptions = {
@@ -9,10 +9,10 @@ export type LayerOptions = {
   posY?: number;
   opacity?: number;
   isActive?: boolean;
-  onStep?: StepHandler;
+  onStep?: (params: StepParams, layer: Layer) => void;
 };
 
-export const DEFAULT_LAYER_OPTIONS: LayerOptions = {
+export const DEFAULT_LAYER_OPTIONS: Omit<LayerOptions, 'source'> = {
   isActive: true,
   opacity: 1,
   posX: 0,
@@ -20,7 +20,8 @@ export const DEFAULT_LAYER_OPTIONS: LayerOptions = {
   onStep: null,
 };
 
-type LayerConfig = Omit<LayerOptions, 'isActive'> & {
+type LayerState = Omit<LayerOptions, 'isActive' | 'source'> & {
+  source?: ElementType;
   isActive: boolean;
   isReady: boolean;
   sourcePromise?: SourcePromise;
@@ -28,7 +29,7 @@ type LayerConfig = Omit<LayerOptions, 'isActive'> & {
 };
 
 export class Layer {
-  #config: LayerConfig = {
+  #state: LayerState = {
     ...DEFAULT_LAYER_OPTIONS,
     isActive: false,
     isReady: false,
@@ -53,14 +54,14 @@ export class Layer {
   }
 
   #setSource = (sourcePromise: SourcePromise, isActive?: boolean) => {
-    this.#config.sourcePromise = sourcePromise;
+    this.#state.sourcePromise = sourcePromise;
 
-    sourcePromise
+    this.#state.sourcePromise
       .then(({ element, ...size }) => {
-        this.#config.source = element;
-        this.#config.size = size;
-        this.#config.isActive = isActive;
-        this.#config.isReady = true;
+        this.#state.source = element;
+        this.#state.size = size;
+        this.#state.isActive = isActive;
+        this.#state.isReady = true;
 
         return { element, ...size };
       })
@@ -68,55 +69,55 @@ export class Layer {
   };
 
   get sourcePromise() {
-    return this.#config.sourcePromise;
+    return this.#state.sourcePromise;
   }
 
   get source() {
-    return this.#config.source;
+    return this.#state.source;
   }
 
   get size() {
-    return this.#config.size;
+    return this.#state.size;
   }
 
   get posX() {
-    return this.#config.posX;
+    return this.#state.posX;
   }
 
   set posX(value) {
-    if (typeof value === 'number') this.#config.posX = value;
+    if (typeof value === 'number') this.#state.posX = value;
   }
 
   get posY() {
-    return this.#config.posY;
+    return this.#state.posY;
   }
 
   set posY(value) {
-    if (typeof value === 'number') this.#config.posY = value;
+    if (typeof value === 'number') this.#state.posY = value;
   }
 
   get opacity() {
-    return this.#config.opacity;
+    return this.#state.opacity;
   }
 
   set opacity(opacity) {
-    if (typeof opacity === 'number') this.#config.opacity = Math.max(0, Math.min(1, opacity));
+    if (typeof opacity === 'number') this.#state.opacity = Math.max(0, Math.min(1, opacity));
   }
 
   get onStep() {
-    return this.#config.onStep;
+    return this.#state.onStep;
   }
 
   set onStep(handler) {
-    this.#config.onStep = handler;
+    this.#state.onStep = handler;
   }
 
   get isActive() {
-    return this.#config.isActive;
+    return this.#state.isActive;
   }
 
   set isActive(isActive) {
-    if (this.#config.isReady) this.#config.isActive = !!isActive;
+    if (this.#state.isReady) this.#state.isActive = !!isActive;
   }
 
   toggle() {
