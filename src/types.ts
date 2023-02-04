@@ -16,4 +16,4 @@ export type ElementInfo = SourceDimensions & { element: ElementType };
 
 export type SourcePromise = Promise<ElementInfo>;
 
-export type ValidElementTypes = typeof HTMLElement[];
+export type ValidElementTypes = (typeof HTMLElement)[];

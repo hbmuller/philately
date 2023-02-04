@@ -4,11 +4,11 @@ import {
   ERROR_INVALID_ONSTEP_CALLBACK,
   ERROR_INVALID_TARGET,
   VALID_TARGET_TYPES,
-} from './constants';
-import type { ElementInfo, StepParams } from './types';
+} from "./constants";
+import type { ElementInfo, StepParams } from "./types";
 
-import { Layer } from './Layer';
-import { getElement } from './utils';
+import { Layer } from "./Layer";
+import { getElement } from "./utils";
 
 export type EngineOptions = {
   target?: string | HTMLCanvasElement;
@@ -25,7 +25,7 @@ export const DEFAULT_ENGINE_OPTIONS: EngineOptions = {
   autoResize: true,
 };
 
-type EngineState = Omit<EngineOptions, 'autoStart' | 'target'> & {
+type EngineState = Omit<EngineOptions, "autoStart" | "target"> & {
   target?: HTMLCanvasElement;
   context?: CanvasRenderingContext2D;
   isRunning: boolean;
@@ -73,7 +73,7 @@ export class Engine {
     if (!element) throw new Error(ERROR_INVALID_TARGET);
 
     this.#state.target = element as HTMLCanvasElement;
-    this.#state.context = this.#state.target.getContext('2d');
+    this.#state.context = this.#state.target.getContext("2d");
 
     if (this.autoResize) this.#resetTargetSize();
   }
@@ -88,9 +88,12 @@ export class Engine {
     this.#state.layers = [];
     newLayers.forEach((layer) => this.addLayer(layer, false));
 
-    this.#state.layersPromise = Promise.all(this.layers.map(({ sourcePromise }) => sourcePromise));
+    this.#state.layersPromise = Promise.all(
+      this.layers.map(({ sourcePromise }) => sourcePromise)
+    );
 
-    if (this.target && !this.isRunning) this.#state.layersPromise.then(this.draw);
+    if (this.target && !this.isRunning)
+      this.#state.layersPromise.then(this.draw);
   }
 
   addLayer(layer: Layer, shouldDraw = true) {
@@ -125,8 +128,10 @@ export class Engine {
   set autoResize(value) {
     const autoResize = !!value;
 
-    if (autoResize && !this.autoResize) window.addEventListener('resize', this.#resetTargetSize);
-    if (!autoResize && this.autoResize) window.removeEventListener('resize', this.#resetTargetSize);
+    if (autoResize && !this.autoResize)
+      window.addEventListener("resize", this.#resetTargetSize);
+    if (!autoResize && this.autoResize)
+      window.removeEventListener("resize", this.#resetTargetSize);
 
     this.#state.autoResize = autoResize;
   }
@@ -136,7 +141,8 @@ export class Engine {
   }
 
   set onStep(handler) {
-    if (handler && typeof handler !== 'function') throw new Error(ERROR_INVALID_ONSTEP_CALLBACK);
+    if (handler && typeof handler !== "function")
+      throw new Error(ERROR_INVALID_ONSTEP_CALLBACK);
 
     this.#state.onStep = handler;
   }
@@ -171,7 +177,9 @@ export class Engine {
       }),
     };
 
-    this.layers.forEach((layer) => layer.onStep && layer.onStep(stepParams, layer));
+    this.layers.forEach(
+      (layer) => layer.onStep && layer.onStep(stepParams, layer)
+    );
     this.onStep && this.onStep(stepParams);
 
     this.draw();

@@ -1,6 +1,11 @@
-import { ERROR_INVALID_SOURCE, VALID_SOURCE_TYPES } from './constants';
-import type { ElementType, SourceDimensions, SourcePromise, StepParams } from './types';
-import { createSource, getAsyncElement } from './utils';
+import { ERROR_INVALID_SOURCE, VALID_SOURCE_TYPES } from "./constants";
+import type {
+  ElementType,
+  SourceDimensions,
+  SourcePromise,
+  StepParams,
+} from "./types";
+import { createSource, getAsyncElement } from "./utils";
 
 export type LayerOptions = {
   source?: string | ElementType;
@@ -12,7 +17,7 @@ export type LayerOptions = {
   onStep?: (params: StepParams, layer: Layer) => void;
 };
 
-export const DEFAULT_LAYER_OPTIONS: Omit<LayerOptions, 'source'> = {
+export const DEFAULT_LAYER_OPTIONS: Omit<LayerOptions, "source"> = {
   isActive: true,
   opacity: 1,
   posX: 0,
@@ -20,7 +25,7 @@ export const DEFAULT_LAYER_OPTIONS: Omit<LayerOptions, 'source'> = {
   onStep: null,
 };
 
-type LayerState = Omit<LayerOptions, 'isActive' | 'source'> & {
+type LayerState = Omit<LayerOptions, "isActive" | "source"> & {
   source?: ElementType;
   isActive: boolean;
   isReady: boolean;
@@ -85,7 +90,7 @@ export class Layer {
   }
 
   set posX(value) {
-    if (typeof value === 'number') this.#state.posX = value;
+    if (typeof value === "number") this.#state.posX = value;
   }
 
   get posY() {
@@ -93,7 +98,7 @@ export class Layer {
   }
 
   set posY(value) {
-    if (typeof value === 'number') this.#state.posY = value;
+    if (typeof value === "number") this.#state.posY = value;
   }
 
   get opacity() {
@@ -101,7 +106,8 @@ export class Layer {
   }
 
   set opacity(opacity) {
-    if (typeof opacity === 'number') this.#state.opacity = Math.max(0, Math.min(1, opacity));
+    if (typeof opacity === "number")
+      this.#state.opacity = Math.max(0, Math.min(1, opacity));
   }
 
   get onStep() {

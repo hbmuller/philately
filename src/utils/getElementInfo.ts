@@ -1,4 +1,4 @@
-import type { ElementInfo, ElementType, SourceDimensions } from '../types';
+import type { ElementInfo, ElementType, SourceDimensions } from "../types";
 
 const getImageDimensions = ({
   naturalWidth,
@@ -8,7 +8,10 @@ const getImageDimensions = ({
   height: naturalHeight,
 });
 
-const getCanvasDimensions = ({ width, height }: HTMLCanvasElement): SourceDimensions => ({
+const getCanvasDimensions = ({
+  width,
+  height,
+}: HTMLCanvasElement): SourceDimensions => ({
   width,
   height,
 });
