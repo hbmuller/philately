@@ -1,6 +1,6 @@
 {
   "name": "philately",
-  "version": "0.3.2",
+  "version": "0.4.0",
   "description": "A rendering engine for HTML5 canvas with layer support.",
   "main": "dist/index.js",
   "author": "Henrique Müller <hbmuller@gmail.com>",
