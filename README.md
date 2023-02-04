@@ -1,15 +1,17 @@
+![Philately logo](https://github.com/hbmuller/philately/blob/master/logo.png?raw=true)
+
 # Philately
 
 Philately is a super easy to use rendering engine for HTML5 `<canvas>`. You have a renderer, some layers and that's all. Simple as that. Great for games, interactive media or just drawing some images to the canvas.
 
 ```js
-import { Layer, Engine } from 'philately';
+import { Layer, Engine } from "philately";
 
 // Layers area resolved as promises. So, don't worry about images not being ready.
-const myLayer = new Layer({ imageSrc: './myAwesomeImage.png' });
+const myLayer = new Layer({ imageSrc: "./myAwesomeImage.png" });
 
 const myEngine = new Engine({
-  target: '#my-canvas-element',
+  target: "#my-canvas-element",
   layers: [myLayer],
 });
 
@@ -27,14 +29,14 @@ Philately is made out of two modules: **Layer** and **Engine**. They work togeth
 A basic Philately setup is as simple as:
 
 ```js
-import { Engine, Layer } from 'philately';
+import { Engine, Layer } from "philately";
 
 const myEngine = new Engine({
-  target: '#target',
+  target: "#target",
   layers: [
-    new Layer({ imageSrc: 'path/to/image_01.png', opacity: 0.5 }),
-    new Layer({ source: document.querySelector('#onscreen-image'), posX: 100 }),
-    new Layer({ source: '.onscreen-canvas', isActive: false }),
+    new Layer({ imageSrc: "path/to/image_01.png", opacity: 0.5 }),
+    new Layer({ source: document.querySelector("#onscreen-image"), posX: 100 }),
+    new Layer({ source: ".onscreen-canvas", isActive: false }),
   ],
 });
 ```
@@ -47,17 +49,17 @@ The third layer is deactivated and will be skipped.
 You could also create an offscreen canvas and add it to the engine:
 
 ```js
-import { Engine, Layer } from 'philately';
+import { Engine, Layer } from "philately";
 
 // Creates an empty engine right away
 const myEngine = new Engine({
-  target: '#my-target',
+  target: "#my-target",
   autoStart: true,
 });
 
 // Creates a <canvas> element and draws a circle on it
-const myCanvas = document.createElement('canvas');
-const ctx = myCanvas.getContext('2d');
+const myCanvas = document.createElement("canvas");
+const ctx = myCanvas.getContext("2d");
 const radius = 50;
 
 myCanvas.width = radius * 2;
@@ -90,8 +92,8 @@ new Layer({
   onStep: ({ now, offset, width, height }, layer) => {}, // Pre-render hook [function]
 
   // It is required that one of the following are set. `imageSrc` takes precedence over `source`
-  imageSrc: 'image.jpg', // Path to image source [string]
-  source: '.canvas-or-image', // Layer source element [string, HTMLImageElement or HTMLCanvasElement]
+  imageSrc: "image.jpg", // Path to image source [string]
+  source: ".canvas-or-image", // Layer source element [string, HTMLImageElement or HTMLCanvasElement]
 });
 ```
 
@@ -117,7 +119,7 @@ new Layer({
 
 ```js
 new Engine({
-  target: '.target-canvas', // `Engine` target element [string or HTMLCanvasElement]
+  target: ".target-canvas", // `Engine` target element [string or HTMLCanvasElement]
   layers: [], // An array of `Layer` instances [array]
   autoStart: false, // Start engine's refresh cycle as soon as layers are ready [boolean]
   autoResize: true, // Bind the target canvas' width and height to the element's display size [boolean]
